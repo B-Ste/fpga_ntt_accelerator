@@ -2,7 +2,7 @@
 
 module modular_subtractor_tb();
 
-    reg clk = 1;
+    reg clk = 0;
     reg [29:0]a;
     reg [29:0]b;
     wire [29:0]c;

@@ -1,6 +1,11 @@
-/*
+*
+!ip/
+!ip/**/
+!ip/**/*.xci
 !Makefile
 !.gitignore
 !src/
+!src/**
 !tb/
+!tb/**
 !tcl/
