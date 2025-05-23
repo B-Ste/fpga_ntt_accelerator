@@ -1,7 +1,9 @@
 *
+!README.md
 !ip/
 !ip/**/
 !ip/**/*.xci
+!ip/**/*.coe
 !Makefile
 !.gitignore
 !src/

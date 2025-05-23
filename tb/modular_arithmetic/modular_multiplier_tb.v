@@ -5,7 +5,7 @@ module modular_multiplier_tb ();
     reg clk = 0;
     reg [29:0]a;
     reg [29:0]b;
-    wire [59:0]c;
+    wire [29:0]c;
 
     modular_multiplier mm (clk, a, b, c);
 
