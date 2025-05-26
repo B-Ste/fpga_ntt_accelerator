@@ -11,7 +11,6 @@ module windowed_reduction60bit (
 
 	parameter modular_index = 0;
 
-	reg [29:0] out1;
 	wire [53:0] w1 = in[53:0];
 	wire [29:0] T1_out, T2_out, T3_out, T4_out, T5_out, T6_out;
 
