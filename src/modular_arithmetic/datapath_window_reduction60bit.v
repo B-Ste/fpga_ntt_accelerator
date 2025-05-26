@@ -4,13 +4,12 @@
 	Modular reduction circuitry by: https://github.com/KULeuven-COSIC/HEAT (modified)
 */
 
-module windowed_reduction60bit (clk, in, out);
+module windowed_reduction60bit (
+	input clk, 
+	input [59:0]in, 
+	output reg [29:0]out);
 
 	parameter modular_index = 0;
-
-	input clk;
-	input [59:0] in;
-	output reg [29:0] out;
 
 	reg [29:0] out1;
 	wire [53:0] w1 = in[53:0];

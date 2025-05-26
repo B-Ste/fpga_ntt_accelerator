@@ -5,14 +5,20 @@ module modular_adder_tb();
     reg clk = 0;
     reg [29:0]a;
     reg [29:0]b;
+    reg [3:0]mod_index;
+    reg mod_sel;
     wire [29:0]c;
     
-    modular_adder #1068564481 ma(clk, a, b, c);
+    modular_adder ma(clk, mod_sel, mod_index, a, b, c);
     
     always #50 clk = ~clk;
     
     initial
     begin
+        mod_index = 7;
+        mod_sel = 1;
+        #100;
+        mod_sel = 0;
         a = 1068564480;
         b = 0;
         #100;
