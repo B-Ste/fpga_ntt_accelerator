@@ -18,11 +18,10 @@ module modular_multiplier (
         .P(mult_out_wire)      // output wire [59 : 0] P
     );
 
-    windowed_reduction60bit #mod_index mod (
-        .clk(clk),
-        .in(mult_out),
-        .out(c)
-    );
+    windowed_reduction60bit #mod_index reduction(
+	    .clk(clk), 
+        .in(mult_out), 
+        .out(c));
 
     always @(posedge clk) mult_out <= mult_out_wire;
     
