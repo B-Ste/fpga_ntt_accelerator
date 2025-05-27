@@ -13,5 +13,5 @@ open:
 	vivado project_ntt_accelerator/project_ntt_accelerator.xpr -source tcl/custom_commands.tcl -tempDir /tmp &
 
 clean:
-	rm -rf vivado.* vivado_* .Xil/ webtalk* -f
+	rm -rf vivado.* vivado_* .Xil/ webtalk* hs_err* -f
 	rm -rf project_ntt_accelerator 

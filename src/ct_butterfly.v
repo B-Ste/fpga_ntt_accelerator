@@ -8,7 +8,8 @@ module ct_butterfly (
 
     parameter mod_index = 0;
 
-    wire [29:0] mult_out;
+    wire [29:0]mult_out;
+    reg [29:0]pipe[8:0];
 
     modular_multiplier #mod_index mult (
         .clk(clk),
@@ -19,15 +20,23 @@ module ct_butterfly (
 
     modular_adder #mod_index adder(
         .clk(clk), 
-        .a(a), 
+        .a(pipe[8]), 
         .b(mult_out), 
         .c(A)
     );
 
     modular_subtractor #mod_index sub(
         .clk(clk), 
-        .a(a),
+        .a(pipe[8]),
         .b(mult_out), 
         .c(B));
+
+    integer i;
+    always @(posedge clk) begin
+        for (i = 0; i < 8; i = i + 1) begin
+            pipe[i + 1] <= pipe[i];
+        end
+        pipe[0] <= a;
+    end
     
 endmodule

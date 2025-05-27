@@ -8,14 +8,13 @@ module modular_multiplier (
 
     parameter mod_index = 0;
 
-    wire [59:0]mult_out_wire;
-    reg [59:0]mult_out;
+    wire [59:0]mult_out;
 
     dsp_multiplier mult (
         .CLK(clk),  // input wire CLK
         .A(a),      // input wire [29 : 0] A
         .B(b),      // input wire [29 : 0] B
-        .P(mult_out_wire)      // output wire [59 : 0] P
+        .P(mult_out)      // output wire [59 : 0] P
     );
 
     windowed_reduction60bit #mod_index reduction(
@@ -23,6 +22,4 @@ module modular_multiplier (
         .in(mult_out), 
         .out(c));
 
-    always @(posedge clk) mult_out <= mult_out_wire;
-    
 endmodule

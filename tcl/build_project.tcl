@@ -22,7 +22,7 @@ add_files -fileset sources_1 $origin_dir/src/
 update_compile_order -fileset sources_1
 
 # Add simulation files in own filesets to permit easy simulation
-set testbenches [glob "tb/*/*.v"]
+set testbenches [glob -directory tb/ *.v */*.v]
 foreach tb $testbenches {
     set tb_name [file rootname [file tail $tb]]
     create_fileset -simset "sim_$tb_name"
