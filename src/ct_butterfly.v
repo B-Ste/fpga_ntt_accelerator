@@ -15,15 +15,13 @@ module ct_butterfly (
         .clk(clk),
         .a(w),
         .b(b),
-        .c(mult_out)
-    );
+        .c(mult_out));
 
     modular_adder #mod_index adder(
         .clk(clk), 
         .a(pipe[8]), 
         .b(mult_out), 
-        .c(A)
-    );
+        .c(A));
 
     modular_subtractor #mod_index sub(
         .clk(clk), 

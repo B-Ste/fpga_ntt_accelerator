@@ -3,6 +3,8 @@ proc create_tb {name} {
     set set_name [file tail $name]
     create_fileset -simset "sim_$set_name"
     add_files -fileset "sim_$set_name" "tb/${name}.v"
+    set_property top $tb_name [get_filesets "sim_$tb_name"]
+    set_property top_lib xil_defaultlib [get_filesets "sim_$tb_name"]
     update_compile_order -fileset "sim_$set_name"
 }
 
