@@ -1,0 +1,15 @@
+set_property -dict {PACKAGE_PIN AG14 IOSTANDARD LVCMOS33} [get_ports {o1[0]}]
+set_property -dict {PACKAGE_PIN AF13 IOSTANDARD LVCMOS33} [get_ports {o1[1]}]
+set_property -dict {PACKAGE_PIN AE13 IOSTANDARD LVCMOS33} [get_ports {o2[0]}]
+set_property -dict {PACKAGE_PIN AJ14 IOSTANDARD LVCMOS33} [get_ports {o2[1]}]
+set_property -dict {PACKAGE_PIN AH14 IOSTANDARD LVCMOS33} [get_ports {o3[0]}]
+set_property -dict {PACKAGE_PIN AL12 IOSTANDARD LVCMOS33} [get_ports {o3[1]}]
+set_property -dict {PACKAGE_PIN AH14 IOSTANDARD LVCMOS33} [get_ports {o3[0]}]
+set_property -dict {PACKAGE_PIN AL12 IOSTANDARD LVCMOS33} [get_ports {o3[1]}]
+
+set_property -dict {PACKAGE_PIN AF15 IOSTANDARD LVCMOS33} [get_ports btn0]
+set_property -dict {PACKAGE_PIN AG13 IOSTANDARD LVCMOS33} [get_ports btn1]
+set_property -dict {PACKAGE_PIN AE14 IOSTANDARD LVCMOS33} [get_ports btn2]
+set_property -dict {PACKAGE_PIN AG15 IOSTANDARD LVCMOS33} [get_ports btn3]
+
+create_clock -period 10.000 -name clk -waveform {0.000 5.000} [get_ports clk]
