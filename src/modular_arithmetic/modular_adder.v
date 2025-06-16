@@ -11,33 +11,33 @@ module modular_adder(
     output reg [29:0]c
     );
 
-    parameter mod_index = 0;
+    parameter MOD_INDEX = 0;
     wire [29:0] q;
 
     generate
-        if (mod_index == 4'd0)
+        if (MOD_INDEX == 4'd0)
             assign q = 1063321601;
-        else if (mod_index == 4'd1)
+        else if (MOD_INDEX == 4'd1)
             assign q = 1063452673;
-        else if (mod_index == 4'd2)
+        else if (MOD_INDEX == 4'd2)
             assign q = 1064697857;
-        else if (mod_index == 4'd3)
+        else if (MOD_INDEX == 4'd3)
             assign q = 1065484289;
-        else if (mod_index == 4'd4)
+        else if (MOD_INDEX == 4'd4)
             assign q = 1065811969;
-        else if (mod_index == 4'd5)
+        else if (MOD_INDEX == 4'd5)
             assign q = 1068236801;
-        else if (mod_index == 4'd6)
+        else if (MOD_INDEX == 4'd6)
             assign q = 1068433409;
-        else if (mod_index == 4'd7)
+        else if (MOD_INDEX == 4'd7)
             assign q = 1068564481;
-        else if (mod_index == 4'd8)
+        else if (MOD_INDEX == 4'd8)
             assign q = 1069219841;
-        else if (mod_index == 4'd9)
+        else if (MOD_INDEX == 4'd9)
             assign q = 1070727169;
-        else if (mod_index == 4'd10)
+        else if (MOD_INDEX == 4'd10)
             assign q = 1071513601;
-        else if (mod_index == 4'd11)
+        else if (MOD_INDEX == 4'd11)
             assign q = 1072496641;
         else
             assign q =1073479681;

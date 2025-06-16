@@ -6,32 +6,34 @@ module ct_butterfly (
     output [29:0]A,
     output [29:0]B);
 
-    parameter mod_index = 0;
+    parameter MOD_INDEX = 0;
+    
+    localparam PIPE_STAGES = 3;
 
     wire [29:0]mult_out;
-    reg [29:0]pipe[8:0];
+    reg [29:0]pipe[PIPE_STAGES:0];
 
-    modular_multiplier #mod_index mult (
+    modular_multiplier #MOD_INDEX mult (
         .clk(clk),
         .a(w),
         .b(b),
         .c(mult_out));
 
-    modular_adder #mod_index adder(
+    modular_adder #MOD_INDEX adder(
         .clk(clk), 
-        .a(pipe[8]), 
+        .a(pipe[PIPE_STAGES]), 
         .b(mult_out), 
         .c(A));
 
-    modular_subtractor #mod_index sub(
+    modular_subtractor #MOD_INDEX sub(
         .clk(clk), 
-        .a(pipe[8]),
+        .a(pipe[PIPE_STAGES]),
         .b(mult_out), 
         .c(B));
 
     integer i;
     always @(posedge clk) begin
-        for (i = 0; i < 8; i = i + 1) begin
+        for (i = 0; i < PIPE_STAGES; i = i + 1) begin
             pipe[i + 1] <= pipe[i];
         end
         pipe[0] <= a;

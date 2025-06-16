@@ -6,26 +6,28 @@ module gs_butterfly (
     output [29:0]a,
     output [29:0]b);
 
-    parameter mod_index = 0;
+    // TODO: Adjust pipeline-stages for shorter multiplier
+
+    parameter MOD_INDEX = 0;
 
     wire [29:0]sub_out;
     wire [29:0]add_out;
     reg [29:0]add_pipe[8:0];
     reg [29:0]w_pipe[1:0];
 
-    modular_adder #mod_index adder(
+    modular_adder #MOD_INDEX adder(
         .clk(clk), 
         .a(A), 
         .b(B), 
         .c(add_out));
 
-    modular_subtractor #mod_index sub(
+    modular_subtractor #MOD_INDEX sub(
         .clk(clk), 
         .a(A),
         .b(B), 
         .c(sub_out));
 
-    modular_multiplier #mod_index mult (
+    modular_multiplier #MOD_INDEX mult (
         .clk(clk),
         .a(sub_out),
         .b(w_pipe[1]),

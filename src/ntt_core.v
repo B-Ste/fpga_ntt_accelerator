@@ -14,45 +14,33 @@ module ntt_core (
     output [29:0]r3,
     output [29:0]r4);
 
-    parameter mod_index = 0;
-    parameter core_index = 0;
-    parameter log_core_count = 5;
+    parameter MOD_INDEX = 0;
+    parameter CORE_INDEX = 11'd0;
+    parameter LOG_CORE_COUNT = 5;
 
-    reg [11:0] upper_twiddle_index, lower_twiddle_index;
+    wire [11:0] upper_twiddle_index, lower_twiddle_index;
     wire [29:0] upper_twiddle, lower_twiddle;
 
     generate
-        if (core_index % 2 == 0) begin
-            always @(posedge clk) begin
-                if (mode == 2'd0) begin
-                    upper_twiddle_index <= (1 << log_m) + (core_index << log_m) >> log_core_count;
-                    lower_twiddle_index <= (1 << log_m) + (core_index << log_m) >> log_core_count;
-                end else if (mode == 2'd1) begin
-                    upper_twiddle_index <= (1 << log_m) + (core_index << log_m) >> log_core_count + (i << 1);
-                    lower_twiddle_index <= (1 << log_m) + (core_index << log_m) >> log_core_count + (i << 1);
-                end else begin
-                    upper_twiddle_index <= (1 << log_m) + (core_index << log_m) >> log_core_count + (read_adress << 2);
-                    lower_twiddle_index <= (1 << log_m) + (core_index << log_m) >> log_core_count + (read_adress << 2) + 1;
-                end
-            end
+        if (CORE_INDEX % 2 == 0) begin
+            assign upper_twiddle_index = (mode == 2'd0) ? (12'd1 << log_m) + ((CORE_INDEX << log_m) >> LOG_CORE_COUNT) :
+                                         (mode == 2'd1) ? (12'd1 << log_m) + ((CORE_INDEX << log_m) >> LOG_CORE_COUNT) + (i << 1) : 
+                                         (12'd1 << log_m) + ((CORE_INDEX << log_m) >> LOG_CORE_COUNT) + (read_adress << 2);
+            assign lower_twiddle_index = (mode == 2'd0) ? (12'd1 << log_m) + ((CORE_INDEX << log_m) >> LOG_CORE_COUNT) :
+                                         (mode == 2'd1) ? (12'd1 << log_m) + ((CORE_INDEX << log_m) >> LOG_CORE_COUNT) + (i << 1) : 
+                                         (12'd1 << log_m) + ((CORE_INDEX << log_m) >> LOG_CORE_COUNT) + (read_adress << 2) + 1;
         end else begin
-            always @(posedge clk) begin
-                if (mode == 2'd0) begin
-                    upper_twiddle_index <= (1 << log_m) + (core_index << log_m) >> log_core_count;
-                    lower_twiddle_index <= (1 << log_m) + (core_index << log_m) >> log_core_count;
-                end else if (mode == 2'd1) begin
-                    upper_twiddle_index <= (1 << log_m) + ((core_index - 1) << log_m) >> log_core_count + (i << 1);
-                    lower_twiddle_index <= (1 << log_m) + ((core_index - 1) << log_m) >> log_core_count + (i << 1);
-                end else begin
-                    upper_twiddle_index <= (1 << log_m) + ((core_index - 1) << log_m) >> log_core_count + (read_adress << 2) + 2;
-                    lower_twiddle_index <= (1 << log_m) + ((core_index - 1) << log_m) >> log_core_count + (read_adress << 2) + 3;
-                end    
-            end
+            assign upper_twiddle_index = (mode == 2'd0) ? (12'd1 << log_m) + ((CORE_INDEX << log_m) >> LOG_CORE_COUNT) :
+                                         (mode == 2'd1) ? (12'd1 << log_m) + ((CORE_INDEX << log_m) >> LOG_CORE_COUNT) + (i << 1) : 
+                                         (12'd1 << log_m) + ((CORE_INDEX << log_m) >> LOG_CORE_COUNT) + (read_adress << 2) + 2;
+            assign lower_twiddle_index = (mode == 2'd0) ? (12'd1 << log_m) + ((CORE_INDEX << log_m) >> LOG_CORE_COUNT) :
+                                         (mode == 2'd1) ? (12'd1 << log_m) + ((CORE_INDEX << log_m) >> LOG_CORE_COUNT) + (i << 1) : 
+                                         (12'd1 << log_m) + ((CORE_INDEX << log_m) >> LOG_CORE_COUNT) + (read_adress << 2) + 3;
         end
     endgenerate
 
     generate
-        if (mod_index == 4'd0) begin
+        if (MOD_INDEX == 4'd0) begin
             twiddle_table_q0 twiddle_rom_0 (
                 .a(upper_twiddle_index),        // input wire [11 : 0] a
                 .spo(upper_twiddle)             // output wire [29 : 0] spo
@@ -61,7 +49,7 @@ module ntt_core (
                 .a(lower_twiddle_index),        // input wire [11 : 0] a
                 .spo(lower_twiddle)             // output wire [29 : 0] spo
             );
-        end else if (mod_index == 4'd1) begin
+        end else if (MOD_INDEX == 4'd1) begin
             twiddle_table_q1 twiddle_rom_0 (
                 .a(upper_twiddle_index),        // input wire [11 : 0] a
                 .spo(upper_twiddle)             // output wire [29 : 0] spo
@@ -70,7 +58,7 @@ module ntt_core (
                 .a(lower_twiddle_index),        // input wire [11 : 0] a
                 .spo(lower_twiddle)             // output wire [29 : 0] spo
             );
-        end else if (mod_index == 4'd2) begin
+        end else if (MOD_INDEX == 4'd2) begin
             twiddle_table_q2 twiddle_rom_0 (
                 .a(upper_twiddle_index),        // input wire [11 : 0] a
                 .spo(upper_twiddle)             // output wire [29 : 0] spo
@@ -79,7 +67,7 @@ module ntt_core (
                 .a(lower_twiddle_index),        // input wire [11 : 0] a
                 .spo(lower_twiddle)             // output wire [29 : 0] spo
             );
-        end else if (mod_index == 4'd3) begin
+        end else if (MOD_INDEX == 4'd3) begin
             twiddle_table_q3 twiddle_rom_0 (
                 .a(upper_twiddle_index),        // input wire [11 : 0] a
                 .spo(upper_twiddle)             // output wire [29 : 0] spo
@@ -88,7 +76,7 @@ module ntt_core (
                 .a(lower_twiddle_index),        // input wire [11 : 0] a
                 .spo(lower_twiddle)             // output wire [29 : 0] spo
             );
-        end else if (mod_index == 4'd4) begin
+        end else if (MOD_INDEX == 4'd4) begin
             twiddle_table_q4 twiddle_rom_0 (
                 .a(upper_twiddle_index),        // input wire [11 : 0] a
                 .spo(upper_twiddle)             // output wire [29 : 0] spo
@@ -97,7 +85,7 @@ module ntt_core (
                 .a(lower_twiddle_index),        // input wire [11 : 0] a
                 .spo(lower_twiddle)             // output wire [29 : 0] spo
             );
-        end else if (mod_index == 4'd5) begin
+        end else if (MOD_INDEX == 4'd5) begin
             twiddle_table_q5 twiddle_rom_0 (
                 .a(upper_twiddle_index),        // input wire [11 : 0] a
                 .spo(upper_twiddle)             // output wire [29 : 0] spo
@@ -106,7 +94,7 @@ module ntt_core (
                 .a(lower_twiddle_index),        // input wire [11 : 0] a
                 .spo(lower_twiddle)             // output wire [29 : 0] spo
             );
-        end else if (mod_index == 4'd6) begin
+        end else if (MOD_INDEX == 4'd6) begin
             twiddle_table_q6 twiddle_rom_0 (
                 .a(upper_twiddle_index),        // input wire [11 : 0] a
                 .spo(upper_twiddle)             // output wire [29 : 0] spo
@@ -115,7 +103,7 @@ module ntt_core (
                 .a(lower_twiddle_index),        // input wire [11 : 0] a
                 .spo(lower_twiddle)             // output wire [29 : 0] spo
             );
-        end else if (mod_index == 4'd7) begin
+        end else if (MOD_INDEX == 4'd7) begin
             twiddle_table_q7 twiddle_rom_0 (
                 .a(upper_twiddle_index),        // input wire [11 : 0] a
                 .spo(upper_twiddle)             // output wire [29 : 0] spo
@@ -124,7 +112,7 @@ module ntt_core (
                 .a(lower_twiddle_index),        // input wire [11 : 0] a
                 .spo(lower_twiddle)             // output wire [29 : 0] spo
             );
-        end else if (mod_index == 4'd8) begin
+        end else if (MOD_INDEX == 4'd8) begin
             twiddle_table_q8 twiddle_rom_0 (
                 .a(upper_twiddle_index),        // input wire [11 : 0] a
                 .spo(upper_twiddle)             // output wire [29 : 0] spo
@@ -133,7 +121,7 @@ module ntt_core (
                 .a(lower_twiddle_index),        // input wire [11 : 0] a
                 .spo(lower_twiddle)             // output wire [29 : 0] spo
             );
-        end else if (mod_index == 4'd9) begin
+        end else if (MOD_INDEX == 4'd9) begin
             twiddle_table_q9 twiddle_rom_0 (
                 .a(upper_twiddle_index),        // input wire [11 : 0] a
                 .spo(upper_twiddle)             // output wire [29 : 0] spo
@@ -142,7 +130,7 @@ module ntt_core (
                 .a(lower_twiddle_index),        // input wire [11 : 0] a
                 .spo(lower_twiddle)             // output wire [29 : 0] spo
             );
-        end else if (mod_index == 4'd10) begin
+        end else if (MOD_INDEX == 4'd10) begin
             twiddle_table_q10 twiddle_rom_0 (
                 .a(upper_twiddle_index),        // input wire [11 : 0] a
                 .spo(upper_twiddle)             // output wire [29 : 0] spo
@@ -151,7 +139,7 @@ module ntt_core (
                 .a(lower_twiddle_index),        // input wire [11 : 0] a
                 .spo(lower_twiddle)             // output wire [29 : 0] spo
             );
-        end else if (mod_index == 4'd11) begin
+        end else if (MOD_INDEX == 4'd11) begin
             twiddle_table_q11 twiddle_rom_0 (
                 .a(upper_twiddle_index),        // input wire [11 : 0] a
                 .spo(upper_twiddle)             // output wire [29 : 0] spo
@@ -194,7 +182,7 @@ module ntt_core (
         .doutb(lower_bram_output)       // output wire [59 : 0] doutb
     );
 
-    ct_butterfly upper_butterfly(
+    ct_butterfly #MOD_INDEX upper_butterfly(
         .clk(clk),
         .a(upper_bram_output[29:0]),
         .b(upper_bram_output[59:30]),
@@ -203,7 +191,7 @@ module ntt_core (
         .B(r2)
     );
 
-    ct_butterfly lower_butterfly(
+    ct_butterfly #MOD_INDEX lower_butterfly(
         .clk(clk),
         .a(lower_bram_output[29:0]),
         .b(lower_bram_output[59:30]),
