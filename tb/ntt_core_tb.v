@@ -5,7 +5,8 @@ module ntt_core_tb();
     reg clk = 0;
     reg [3:0]log_m;
     reg [9:0]i;
-    reg [8:0]read_adress;
+    reg [8:0]upper_read_adress;
+    reg [8:0]lower_read_adress;
     reg write_enable;
     reg [1:0]mode;
     reg [8:0]upper_write_adress;
@@ -18,7 +19,8 @@ module ntt_core_tb();
         .clk(clk),
         .log_m(log_m),
         .i(i),
-        .read_adress(read_adress),
+        .upper_read_address(upper_read_adress),
+        .lower_read_address(lower_read_adress),
         .write_enable(write_enable),
         .mode(mode),
         .upper_write_address(upper_write_adress),
@@ -51,16 +53,20 @@ module ntt_core_tb();
         i <= 2;
         #100;
         mode <= 3;
-        read_adress <= 0;
+        upper_read_adress <= 0;
+        lower_read_adress <= 0;
         #100;
-        read_adress <= 1;
+        lower_read_adress <= 1;
+        upper_read_adress <= 1;
         #100;
-        read_adress <= 2;
+        lower_read_adress <= 2;
+        upper_read_adress <= 2;
         #100;
         log_m <= 1;
         mode <= 0;
         i <= 0;
-        read_adress <= 9'd0;
+        upper_read_adress <= 0;
+        lower_read_adress <= 0;
         write_enable <= 1;
         upper_write_adress <= 0;
         upper_data_input <= {30'd0, 30'd100};
@@ -76,33 +82,44 @@ module ntt_core_tb();
         upper_data_input <= {30'd54321, 30'd1};
         lower_write_adress <= 2;
         lower_data_input <= {30'd12345, 30'd10};
-        read_adress <= 9'd1;
+        lower_read_adress <= 1;
+        upper_read_adress <= 1;
         #100;
         upper_write_adress <= 3;
         upper_data_input <= {30'd72365, 30'd100};
         lower_write_adress <= 3;
         lower_data_input <= {30'd2, 30'd10};
-        read_adress <= 9'd2;
+        lower_read_adress <= 2;
+        upper_read_adress <= 2;
         #100;
         write_enable <= 0;
-        read_adress <= 9'd3;
+        lower_read_adress <= 3;
+        upper_read_adress <= 3;
         #100;
-        read_adress <= 9'd0;
+        lower_read_adress <= 0;
+        upper_read_adress <= 0;
         #100;
-        read_adress <= 9'd1;
+        lower_read_adress <= 1;
+        upper_read_adress <= 1;
         #100;
-        read_adress <= 9'd2;
+        lower_read_adress <= 2;
+        upper_read_adress <= 2;
         #100;
-        read_adress <= 9'd3;
+        lower_read_adress <= 3;
+        upper_read_adress <= 3;
         log_m <= 2;
         #100;
-        read_adress <= 9'd0;
+        lower_read_adress <= 0;
+        upper_read_adress <= 0;
         #100;
-        read_adress <= 9'd1;
+        lower_read_adress <= 1;
+        upper_read_adress <= 1;
         #100;
-        read_adress <= 9'd2;
+        lower_read_adress <= 2;
+        upper_read_adress <= 2;
         #100;
-        read_adress <= 9'd3;
+        lower_read_adress <= 3;
+        upper_read_adress <= 3;
     end
 
 endmodule
