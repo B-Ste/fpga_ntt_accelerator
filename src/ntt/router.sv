@@ -14,9 +14,9 @@ module router #(parameter LOG_CORE_COUNT = 5)(
 
     integer k;
     always @(posedge clk) begin
-        for (k = 0; k < LOG_CORE_COUNT; k = k + 1) begin
-            if (log_t > LOG_N - (LOG_CORE_COUNT + 2)) begin
-                if (((k << (log_m + 1)) >> LOG_CORE_COUNT) & 1 == 0) begin
+        for (k = 0; k < (1 << LOG_CORE_COUNT); k = k + 1) begin
+            if (log_t > (LOG_N - (LOG_CORE_COUNT + 2))) begin
+                if ((((k << (log_m + 1)) >> LOG_CORE_COUNT) & 1) == 0) begin
                     loop[k][0] <= {in[k][2], in[k][0]};
                     address_loop[k][0] <= address_0;
                     loop[k][1] <= {in[k + (1 << (1 + log_t + LOG_CORE_COUNT - LOG_N))][2], in[k + (1 << (1 + log_t + LOG_CORE_COUNT - LOG_N))][0]};
@@ -29,8 +29,8 @@ module router #(parameter LOG_CORE_COUNT = 5)(
                 end
             end else begin
                 if (log_t > 0) begin
-                    if (k & 1 == 0) begin
-                        if (address_0 & ((1 << log_t) - 1) < (1 << (log_t - 1))) begin
+                    if ((k & 1) == 0) begin
+                        if ((address_0 & ((1 << log_t) - 1)) < ((1 << (log_t - 1)))) begin
                             loop[k][0] <= {in[k][2], in[k][0]};
                             address_loop[k][0] <= address_0;
                             loop[k + 1][0] <= {in[k][3], in[k][1]};
@@ -42,7 +42,7 @@ module router #(parameter LOG_CORE_COUNT = 5)(
                             address_loop[k + 1][1] <= address_0 - (1 << (log_t - 1));
                         end
                     end else begin
-                        if (address_1 & ((1 << log_t) - 1) < (1 << (log_t - 1))) begin
+                        if ((address_1 & ((1 << log_t) - 1)) < ((1 << (log_t - 1)))) begin
                             loop[k - 1][0] <= {in[k][2], in[k][0]};
                             address_loop[k - 1][0] <= address_1 + (1 << (log_t - 1));
                             loop[k][0] <= {in[k][3], in[k][1]};

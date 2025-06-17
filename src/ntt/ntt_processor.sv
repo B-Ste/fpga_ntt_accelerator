@@ -6,15 +6,15 @@ module ntt_processor #(
         output [8:0]address_out[(1 << LOG_CORE_COUNT) - 1:0]
     );
 
-    reg write_enable = 0;
-    reg [1:0]mode = 0;
-    reg [3:0]log_m = 1;
-    reg [3:0]log_t = 1024;
-    reg [9:0]i = 0;
-    reg [8:0]upper_read_address = 0;
-    reg [8:0]lower_read_address = 0; 
-    reg [8:0]write_adress_0 = 0; 
-    reg [8:0]write_adress_1 = 0;
+    reg write_enable;
+    reg [1:0]mode;
+    reg [3:0]log_m;
+    reg [3:0]log_t;
+    reg [9:0]i;
+    reg [8:0]upper_read_address;
+    reg [8:0]lower_read_address; 
+    reg [8:0]write_adress_0; 
+    reg [8:0]write_adress_1;
     wire [29:0]router_in[(1 << LOG_CORE_COUNT) - 1:0][3:0];
     wire [59:0]router_loop[(1 << LOG_CORE_COUNT) - 1:0][1:0];
     wire [8:0]router_address_loop[(1 << LOG_CORE_COUNT) - 1:0][1:0];
