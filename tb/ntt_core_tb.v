@@ -35,6 +35,8 @@ module ntt_core_tb();
     always #50 clk = ~clk;
         
     initial begin
+        upper_read_adress <= 0;
+        lower_read_adress <= 0;
         log_m <= 1;
         i <= 0;
         mode <= 0;
