@@ -4,7 +4,8 @@ module ntt_core (
     input [9:0]i,
     input [8:0]upper_read_address,
     input [8:0]lower_read_address,
-    input write_enable,
+    input upper_write_enable,
+    input lower_write_enable,
     input [1:0]mode,
     input [8:0]upper_write_address,
     input [59:0]upper_data_input,
@@ -174,7 +175,7 @@ module ntt_core (
 
     ntt_core_bram upper_bram (
         .clka(clk),                     // input wire clka
-        .wea(write_enable),             // input wire [0 : 0] wea
+        .wea(upper_write_enable),             // input wire [0 : 0] wea
         .addra(upper_write_address),    // input wire [8 : 0] addra
         .dina(upper_data_input),        // input wire [59 : 0] dina
         .clkb(clk),                     // input wire clkb
@@ -184,7 +185,7 @@ module ntt_core (
 
     ntt_core_bram lower_bram (
         .clka(clk),                     // input wire clka
-        .wea(write_enable),             // input wire [0 : 0] wea
+        .wea(lower_write_enable),             // input wire [0 : 0] wea
         .addra(lower_write_address),    // input wire [8 : 0] addra
         .dina(lower_data_input),        // input wire [59 : 0] dina
         .clkb(clk),                     // input wire clkb
