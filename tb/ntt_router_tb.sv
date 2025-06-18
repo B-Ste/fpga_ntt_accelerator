@@ -29,16 +29,14 @@ module ntt_router_tb();
     always #50 clk = ~clk;
 
     integer fd_loop;
-    integer fd_address_loop;
     integer i;
     initial begin
         fd_loop = $fopen("loop.txt", "w");
-        fd_address_loop = $fopen("address_loop.txt", "w");
 
-        log_m = 5;
-        log_t = 5;
-        address_0 = 0;
-        address_1 = 16;
+        log_m = 11;
+        log_t = -1;
+        address_0 = 10;
+        address_1 = 10;
         for (i = 0; i < (1 << LOG_CORE_COUNT); i = i + 1) begin
             in[i][0] = 4 * i;
             in[i][1] = 4 * i + 1;
@@ -48,17 +46,27 @@ module ntt_router_tb();
 
         #100;
         
+        /*
         for (i = 0; i < (1 << LOG_CORE_COUNT); i = i + 1) begin
             $fdisplay(fd_loop, loop[i][0][29:0]);
             $fdisplay(fd_loop, loop[i][0][59:30]);
+            $fdisplay(fd_loop, address_loop[i][0]);
             $fdisplay(fd_loop, loop[i][1][29:0]);
             $fdisplay(fd_loop, loop[i][1][59:30]);
-            $fdisplayb(fd_address_loop, address_loop[i][0]);
-            $fdisplayb(fd_address_loop, address_loop[i][1]);
+            $fdisplay(fd_loop, address_loop[i][1]);
+        end
+        */
+
+        for (i = 0; i < (1 << LOG_CORE_COUNT); i = i + 1) begin
+            $fdisplay(fd_loop, out[i][0][29:0]);
+            $fdisplay(fd_loop, out[i][0][59:30]);
+            $fdisplay(fd_loop, address_out[i]);
+            $fdisplay(fd_loop, out[i][1][29:0]);
+            $fdisplay(fd_loop, out[i][1][59:30]);
+            $fdisplay(fd_loop, address_out[i]);
         end
 
         $fclose(fd_loop);
-        $fclose(fd_address_loop);
     end
 
 endmodule
