@@ -2,8 +2,7 @@ module ntt_core (
     input clk,
     input [3:0]log_m,
     input [9:0]i,
-    input [8:0]upper_read_address,
-    input [8:0]lower_read_address,
+    input [8:0]read_address,
     input upper_write_enable,
     input lower_write_enable,
     input [1:0]mode,
@@ -29,17 +28,17 @@ module ntt_core (
         if (CORE_INDEX % 2 == 0) begin
             assign upper_twiddle_index = (mode == 2'd0) ? (12'd1 << log_m) + ((CORE_INDEX << log_m) >> LOG_CORE_COUNT) :
                                          (mode == 2'd1) ? (12'd1 << log_m) + ((CORE_INDEX << log_m) >> LOG_CORE_COUNT) + (i << 1) : 
-                                         (12'd1 << log_m) + ((CORE_INDEX << log_m) >> LOG_CORE_COUNT) + (upper_read_address << 2);
+                                         (12'd1 << log_m) + ((CORE_INDEX << log_m) >> LOG_CORE_COUNT) + (read_address << 2);
             assign lower_twiddle_index = (mode == 2'd0) ? (12'd1 << log_m) + ((CORE_INDEX << log_m) >> LOG_CORE_COUNT) :
                                          (mode == 2'd1) ? (12'd1 << log_m) + ((CORE_INDEX << log_m) >> LOG_CORE_COUNT) + (i << 1) : 
-                                         (12'd1 << log_m) + ((CORE_INDEX << log_m) >> LOG_CORE_COUNT) + (lower_read_address << 2) + 1;
+                                         (12'd1 << log_m) + ((CORE_INDEX << log_m) >> LOG_CORE_COUNT) + (read_address << 2) + 1;
         end else begin
             assign upper_twiddle_index = (mode == 2'd0) ? (12'd1 << log_m) + ((CORE_INDEX << log_m) >> LOG_CORE_COUNT) :
                                          (mode == 2'd1) ? (12'd1 << log_m) + ((CORE_INDEX << log_m) >> LOG_CORE_COUNT) + (i << 1) : 
-                                         (12'd1 << log_m) + ((CORE_INDEX << log_m) >> LOG_CORE_COUNT) + (upper_read_address << 2) + 2;
+                                         (12'd1 << log_m) + ((CORE_INDEX << log_m) >> LOG_CORE_COUNT) + (read_address << 2) + 2;
             assign lower_twiddle_index = (mode == 2'd0) ? (12'd1 << log_m) + ((CORE_INDEX << log_m) >> LOG_CORE_COUNT) :
                                          (mode == 2'd1) ? (12'd1 << log_m) + ((CORE_INDEX << log_m) >> LOG_CORE_COUNT) + (i << 1) : 
-                                         (12'd1 << log_m) + ((CORE_INDEX << log_m) >> LOG_CORE_COUNT) + (lower_read_address << 2) + 3;
+                                         (12'd1 << log_m) + ((CORE_INDEX << log_m) >> LOG_CORE_COUNT) + (read_address << 2) + 3;
         end
     endgenerate
 
@@ -179,7 +178,7 @@ module ntt_core (
         .addra(upper_write_address),    // input wire [8 : 0] addra
         .dina(upper_data_input),        // input wire [59 : 0] dina
         .clkb(clk),                     // input wire clkb
-        .addrb(upper_read_address),     // input wire [8 : 0] addrb
+        .addrb(read_address),     // input wire [8 : 0] addrb
         .doutb(upper_bram_output)       // output wire [59 : 0] doutb
     );
 
@@ -189,7 +188,7 @@ module ntt_core (
         .addra(lower_write_address),    // input wire [8 : 0] addra
         .dina(lower_data_input),        // input wire [59 : 0] dina
         .clkb(clk),                     // input wire clkb
-        .addrb(lower_read_address),     // input wire [8 : 0] addrb
+        .addrb(read_address),     // input wire [8 : 0] addrb
         .doutb(lower_bram_output)       // output wire [59 : 0] doutb
     );
 
