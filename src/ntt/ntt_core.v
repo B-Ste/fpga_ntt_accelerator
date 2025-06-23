@@ -5,6 +5,8 @@ module ntt_core (
     input [8:0]read_address,
     input upper_write_enable,
     input lower_write_enable,
+    input write_select,
+    input read_select,
     input [1:0]mode,
     input [8:0]upper_write_address,
     input [59:0]upper_data_input,
@@ -21,8 +23,8 @@ module ntt_core (
 
     wire [11:0] upper_twiddle_index, lower_twiddle_index;
     wire [29:0] upper_twiddle, lower_twiddle;
-    reg [29:0] upper_twiddle_reg[1:0];
-    reg [29:0] lower_twiddle_reg[1:0];
+    reg [29:0] upper_twiddle_reg;
+    reg [29:0] lower_twiddle_reg;
 
     generate
         if (CORE_INDEX % 2 == 0) begin
@@ -43,10 +45,10 @@ module ntt_core (
     endgenerate
 
     always @(posedge clk) begin
-        upper_twiddle_reg[0] <= upper_twiddle;
-        lower_twiddle_reg[0] <= lower_twiddle;
-        upper_twiddle_reg[1] <= upper_twiddle_reg[0];
-        lower_twiddle_reg[1] <= lower_twiddle_reg[0];
+        upper_twiddle_reg <= upper_twiddle;
+        lower_twiddle_reg <= lower_twiddle;
+        //upper_twiddle_reg[1] <= upper_twiddle_reg[0];
+        //lower_twiddle_reg[1] <= lower_twiddle_reg[0];
     end
 
     generate
@@ -172,6 +174,27 @@ module ntt_core (
 
     wire [59:0]upper_bram_output, lower_bram_output;
 
+    ntt_core_ram #(.LOG_CORE_COUNT(LOG_CORE_COUNT)) upper_ram (
+        .clk(clk),
+        .write_select(write_select),
+        .write_enable(upper_write_enable),
+        .read_select(read_select),
+        .write_address(upper_write_address),
+        .data_in(upper_data_input),
+        .read_address(read_address),
+        .data_out(upper_bram_output));
+
+    ntt_core_ram #(.LOG_CORE_COUNT(LOG_CORE_COUNT)) lower_ram (
+        .clk(clk),
+        .write_select(write_select),
+        .write_enable(lower_write_enable),
+        .read_select(read_select),
+        .write_address(lower_write_address),
+        .data_in(lower_data_input),
+        .read_address(read_address),
+        .data_out(lower_bram_output));
+
+/*
     ntt_core_bram upper_bram (
         .clka(clk),                     // input wire clka
         .wea(upper_write_enable),             // input wire [0 : 0] wea
@@ -191,12 +214,13 @@ module ntt_core (
         .addrb(read_address),     // input wire [8 : 0] addrb
         .doutb(lower_bram_output)       // output wire [59 : 0] doutb
     );
+    */
 
     ct_butterfly #MOD_INDEX upper_butterfly(
         .clk(clk),
         .a(upper_bram_output[29:0]),
         .b(upper_bram_output[59:30]),
-        .w(upper_twiddle_reg[1]),
+        .w(upper_twiddle_reg),
         .A(r1),
         .B(r2)
     );
@@ -205,7 +229,7 @@ module ntt_core (
         .clk(clk),
         .a(lower_bram_output[29:0]),
         .b(lower_bram_output[59:30]),
-        .w(lower_twiddle_reg[1]),
+        .w(lower_twiddle_reg),
         .A(r3),
         .B(r4)
     );
