@@ -59,7 +59,7 @@ module router #(parameter LOG_CORE_COUNT = 5)(
                         end else begin
                             loop[k - 1][1] <= {in[k][2], in[k][0]};
                             address_loop[1] <= address_1;
-                            loop[1] <= {in[k][3], in[k][1]};
+                            loop[k][1] <= {in[k][3], in[k][1]};
                             address_loop[1] <= address_1;
                         end
                     end

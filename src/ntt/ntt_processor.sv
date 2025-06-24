@@ -19,13 +19,14 @@ module ntt_processor #(
     localparam ALG_THIRD_STAGE = 2'd2;
     localparam STANDBY = 2'd3;
 
-    reg core_write_enable[(1 << LOG_CORE_COUNT) - 1:0][1:0];
     reg [1:0]mode = STANDBY;
     reg [3:0]log_m;
     reg [3:0]log_t;
     reg [9:0]i;
+    reg read_select;
     reg [8:0]even_read_address;
     reg [8:0]odd_read_address; 
+    reg core_write_enable[(1 << LOG_CORE_COUNT) - 1:0][1:0];
     reg [8:0]upper_write_address; 
     reg [8:0]lower_write_address;
     wire [29:0]router_in[(1 << LOG_CORE_COUNT) - 1:0][3:0];
@@ -34,18 +35,66 @@ module ntt_processor #(
     reg [8:0]core_address_input[1:0];
     wire [8:0]router_address_loop[1:0];
 
-    integer pipe_threshold;
-    reg read_select;
     reg [8:0]address_pipe[1:0][PIPE_STAGES - 4:0];
-    reg [3:0]log_m_pipe[PIPE_STAGES - 4:0];
-    reg [3:0]log_t_pipe[PIPE_STAGES - 4:0];
-    reg output_active_pipe[PIPE_STAGES - 1:0];
+    reg [3:0]log_m_pipe[PIPE_STAGES - 3:0];
+    reg [3:0]log_t_pipe[PIPE_STAGES - 3:0];
+    reg output_active_pipe[PIPE_STAGES - 2:0];
     reg write_sel_pipe[PIPE_STAGES - 1:0];
+
     wire [9:0] i_threshold = ((log_m - LOG_CORE_COUNT) > 0) ? ((1 << (log_m - LOG_CORE_COUNT)) - 1) : 0;
+
+    integer pipe_threshold;
     integer j2;
     integer t;
     
-    assign output_active = output_active_pipe[PIPE_STAGES - 1];
+    assign output_active = output_active_pipe[PIPE_STAGES - 2];
+
+    /*
+    integer fd;
+    integer f;
+    reg [8 * 100:0]str;
+    always @(posedge clk) begin
+        if (mode != STANDBY || output_active) begin
+            fd = $fopen("output.txt", "a");
+            for (f = 0; f < (1 << LOG_CORE_COUNT); f = f + 1) begin
+                if (f % 2 == 0) begin
+                    $sformat(str, "m=%0d j=%0d k=%0d r1=%0d", (1 << log_m_pipe[PIPE_STAGES - 4]), address_pipe[0][PIPE_STAGES - 4], f, router_in[f][0]);
+                    $fdisplay(fd, "%0s", str);
+                    $sformat(str, "m=%0d j=%0d k=%0d r2=%0d", (1 << log_m_pipe[PIPE_STAGES - 4]), address_pipe[0][PIPE_STAGES - 4], f, router_in[f][1]);
+                    $fdisplay(fd, "%0s", str);
+                    $sformat(str, "m=%0d j=%0d k=%0d r3=%0d", (1 << log_m_pipe[PIPE_STAGES - 4]), address_pipe[0][PIPE_STAGES - 4], f, router_in[f][2]);
+                    $fdisplay(fd, "%0s", str);
+                    $sformat(str, "m=%0d j=%0d k=%0d r4=%0d", (1 << log_m_pipe[PIPE_STAGES - 4]), address_pipe[0][PIPE_STAGES - 4], f, router_in[f][3]);
+                    $fdisplay(fd, "%0s", str);
+                end else begin
+                    $sformat(str, "m=%0d j=%0d k=%0d r1=%0d", (1 << log_m_pipe[PIPE_STAGES - 4]), address_pipe[1][PIPE_STAGES - 4], f, router_in[f][0]);
+                    $fdisplay(fd, "%0s", str);
+                    $sformat(str, "m=%0d j=%0d k=%0d r2=%0d", (1 << log_m_pipe[PIPE_STAGES - 4]), address_pipe[1][PIPE_STAGES - 4], f, router_in[f][1]);
+                    $fdisplay(fd, "%0s", str);
+                    $sformat(str, "m=%0d j=%0d k=%0d r3=%0d", (1 << log_m_pipe[PIPE_STAGES - 4]), address_pipe[1][PIPE_STAGES - 4], f, router_in[f][2]);
+                    $fdisplay(fd, "%0s", str);
+                    $sformat(str, "m=%0d j=%0d k=%0d r4=%0d", (1 << log_m_pipe[PIPE_STAGES - 4]), address_pipe[1][PIPE_STAGES - 4], f, router_in[f][3]);    
+                    $fdisplay(fd, "%0s", str);             
+                end
+            end
+            $fclose(fd);
+        end
+    end
+
+    integer fd_in;
+    always @(posedge clk) begin
+        if (mode != STANDBY) begin
+            fd_in = $fopen("input.txt", "a");
+            for (f = 0; f < (1 << LOG_CORE_COUNT); f = f + 1) begin
+                $sformat(str, "m=%0d j=%0d k=%0d r1=%0d", (1 << log_m_pipe[PIPE_STAGES - 3]), router_address_loop[0], f, router_loop[f][0]);
+                $fdisplay(fd_in, "%0s", str);
+                $sformat(str, "m=%0d j=%0d k=%0d r2=%0d", (1 << log_m_pipe[PIPE_STAGES - 3]), router_address_loop[1], f, router_loop[f][1]);
+                $fdisplay(fd_in, "%0s", str);
+            end
+            $fclose(fd_in);
+        end
+    end
+    */
     
     always @(posedge clk ) begin
 
@@ -53,14 +102,14 @@ module ntt_processor #(
             write_sel_pipe[t + 1] <= write_sel_pipe[t];
         end
 
-        for (t = 0; t < (PIPE_STAGES - 1); t = t + 1) begin
+        for (t = 0; t < (PIPE_STAGES - 2); t = t + 1) begin
             output_active_pipe[t + 1] <= output_active_pipe[t];
         end
     
         // forwarding of log_m and log_t to router to compensate pipeline-delay
         log_m_pipe[0] <= log_m;
         log_t_pipe[0] <= log_t;
-        for (t = 0; t < (PIPE_STAGES - 4); t = t + 1) begin
+        for (t = 0; t < (PIPE_STAGES - 3); t = t + 1) begin
             log_m_pipe[t + 1] <= log_m_pipe[t];
             log_t_pipe[t + 1] <= log_t_pipe[t];
         end
@@ -191,7 +240,6 @@ module ntt_processor #(
                     i <= 0;
                     upper_write_address <= 0;
                     upper_write_address <= 0;
-                    //pipe_threshold = 0;
                     j2 <= (N_4 >> LOG_CORE_COUNT) - 1;
                     read_select <= 0;
                     write_sel_pipe[0] <= 1;

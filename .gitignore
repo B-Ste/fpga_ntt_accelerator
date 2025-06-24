@@ -11,6 +11,7 @@
 !tb/
 !tb/**
 tb/router_test/files
+tb/processor_test/*.txt
 !tcl/
 !cst/
 !cst/*
