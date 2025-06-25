@@ -10,8 +10,11 @@
 !src/**
 !tb/
 !tb/**
-tb/router_test/files
-tb/processor_test/*.txt
+tb/processor_test/**/*.txt
+tb/processor_test/**/*.jou
+tb/processor_test/**/*.log
+tb/processor_test/output_test/ntt_bench_bar
+tb/router_test/**/*.txt
 !tcl/
 !cst/
 !cst/*

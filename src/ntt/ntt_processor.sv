@@ -49,13 +49,12 @@ module ntt_processor #(
     
     assign output_active = output_active_pipe[PIPE_STAGES - 2];
 
-    /*
     integer fd;
     integer f;
     reg [8 * 100:0]str;
     always @(posedge clk) begin
         if (mode != STANDBY || output_active) begin
-            fd = $fopen("output.txt", "a");
+            fd = $fopen("tracing.txt", "a");
             for (f = 0; f < (1 << LOG_CORE_COUNT); f = f + 1) begin
                 if (f % 2 == 0) begin
                     $sformat(str, "m=%0d j=%0d k=%0d r1=%0d", (1 << log_m_pipe[PIPE_STAGES - 4]), address_pipe[0][PIPE_STAGES - 4], f, router_in[f][0]);
@@ -94,7 +93,6 @@ module ntt_processor #(
             $fclose(fd_in);
         end
     end
-    */
     
     always @(posedge clk ) begin
 

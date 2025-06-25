@@ -41,4 +41,4 @@ def main(file1, file2):
 
 # Example usage
 if __name__ == "__main__":
-    main("tb/processor_test/output.txt", "tb/processor_test/out_soft.txt")
+    main("tb/processor_test/tracing.txt", "tb/processor_test/output.txt")

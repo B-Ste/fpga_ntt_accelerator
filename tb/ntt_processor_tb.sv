@@ -22,39 +22,40 @@ module ntt_processor_tb();
     );
     
     always #50 clk = ~clk;
-    
-    integer fd;
+    integer fd_in;
+    integer fd_out;
     integer i = 0;
-    reg [29:0]upper, lower;
+    reg [59:0]input_coe;
     initial begin
-        fd = $fopen("ntt_processor_output.txt", "w");
+        fd_out = $fopen("output.txt", "w");
+        fd_in = $fopen("input.txt", "r");
         write_enable = 1;
         #100;
         while (i < 2048) begin
-            lower = i;
-            upper = 0;
-            data_in = {upper, lower};
+            $fscanf(fd_in, "%0d", input_coe);
+            data_in = input_coe;
             address_in = i;
             i = i + 1;
             #100;
         end
+        $fclose(fd_in);
         start = 1;
         write_enable = 0;
         #100;
         start = 0;
-        $fclose(fd);
+        $fclose(fd_out);
     end
     
     always @(posedge clk) begin
         if (output_active) begin
-            fd = $fopen("ntt_processor_output.txt", "a");
+            fd_out = $fopen("output_processor.txt", "a");
             for (i = 0; i < (1 << LOG_CORE_COUNT); i = i + 1) begin
-                $fdisplay(fd, out[i][0][29:0]);
-                $fdisplay(fd, out[i][0][59:30]);
-                $fdisplay(fd, out[i][1][29:0]);
-                $fdisplay(fd, out[i][1][59:30]);
+                $fdisplay(fd_out, out[i][0][29:0]);
+                $fdisplay(fd_out, out[i][0][59:30]);
+                $fdisplay(fd_out, out[i][1][29:0]);
+                $fdisplay(fd_out, out[i][1][59:30]);
             end
-            $fclose(fd);
+            $fclose(fd_out);
         end
     end
 
