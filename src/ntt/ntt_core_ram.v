@@ -7,24 +7,51 @@ module ntt_core_ram #(
     input [((LOG_N - (LOG_CORE_COUNT + 2))) - 1:0]write_address,
     input [59:0]data_in,
     input [(LOG_N - (LOG_CORE_COUNT + 2)) - 1:0]read_address,
-    output reg [59:0]data_out);
+    output [59:0]data_out);
 
     localparam LOG_N = 12;
     localparam HEIGHT = 1 << (LOG_N - (LOG_CORE_COUNT + 2));
 
-    reg [59:0]memory[HEIGHT - 1:0][1:0];
+    (* ram_style = "block" *) reg [59:0]memory_0[HEIGHT - 1:0];
+    (* ram_style = "block" *) reg [59:0]memory_1[HEIGHT - 1:0];
+    reg [59:0]output_0;
+    reg [59:0]output_1;
+    reg read_select_pipe;
+    wire we_1 = (write_select && write_enable) ? 1 : 0;
+    wire we_0 = ((~write_select) && write_enable) ? 1 : 0;
+
+    assign data_out = read_select_pipe ? output_1 : output_0;
 
     integer i;
     initial begin
         for (i = 0; i < HEIGHT; i = i + 1) begin
-            memory[i][0] <= 0;
-            memory[i][1] <= 0;
+            memory_0[i] <= 0;
+            memory_1[i] <= 0;
         end
     end
 
     always @(posedge clk) begin
-        data_out <= memory[read_address][read_select];
-        if (write_enable) memory[write_address][write_select] <= data_in;
+        read_select_pipe <= read_select;
+    end
+
+    always @(posedge clk) begin
+        output_0 <= memory_0[read_address];
+    end
+
+    always @(posedge clk) begin
+        output_1 <= memory_1[read_address];
+    end
+
+    always @(posedge clk) begin
+        if (we_0) begin 
+            memory_0[write_address] <= data_in;
+        end
+    end
+
+    always @(posedge clk) begin
+        if (we_1) begin 
+            memory_1[write_address] <= data_in;
+        end
     end
     
 endmodule
