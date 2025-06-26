@@ -1,6 +1,6 @@
 module ntt_processor #(
     parameter MOD_INDEX = 0,
-    parameter LOG_CORE_COUNT = 5) (
+    parameter LOG_CORE_COUNT = 4) (
         input clk,
         input write_enable,
         input start,
@@ -49,6 +49,7 @@ module ntt_processor #(
     
     assign output_active = output_active_pipe[PIPE_STAGES - 2];
 
+    /*
     integer fd;
     integer f;
     reg [8 * 100:0]str;
@@ -93,6 +94,7 @@ module ntt_processor #(
             $fclose(fd_in);
         end
     end
+    */
     
     always @(posedge clk ) begin
 
