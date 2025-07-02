@@ -6,13 +6,13 @@ module gs_butterfly (
     output [29:0]a,
     output [29:0]b);
 
-    // TODO: Adjust pipeline-stages for shorter multiplier
-
     parameter MOD_INDEX = 0;
+
+    localparam PIPE_STAGES = 3;
 
     wire [29:0]sub_out;
     wire [29:0]add_out;
-    reg [29:0]add_pipe[8:0];
+    reg [29:0]add_pipe[PIPE_STAGES:0];
     reg [29:0]w_pipe[1:0];
 
     modular_adder #MOD_INDEX adder(
@@ -33,10 +33,10 @@ module gs_butterfly (
         .b(w_pipe[1]),
         .c(b));
 
-    assign a = add_pipe[8];
+    assign a = add_pipe[PIPE_STAGES];
     integer i;
     always @(posedge clk) begin
-        for (i = 0; i < 8; i = i + 1) begin
+        for (i = 0; i < PIPE_STAGES; i = i + 1) begin
             add_pipe[i + 1] <= add_pipe[i];
         end
         add_pipe[0] <= add_out;
