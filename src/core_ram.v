@@ -1,4 +1,4 @@
-module ntt_core_ram #(
+module core_ram #(
     parameter LOG_CORE_COUNT = 5) (
     input clk,
     input write_select,

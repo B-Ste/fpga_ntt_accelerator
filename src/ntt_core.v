@@ -172,7 +172,7 @@ module ntt_core (
 
     wire [59:0]upper_bram_output, lower_bram_output;
 
-    ntt_core_ram #(.LOG_CORE_COUNT(LOG_CORE_COUNT)) upper_ram (
+    core_ram #(.LOG_CORE_COUNT(LOG_CORE_COUNT)) upper_ram (
         .clk(clk),
         .write_select(write_select),
         .write_enable(upper_write_enable),
@@ -182,7 +182,7 @@ module ntt_core (
         .read_address(read_address),
         .data_out(upper_bram_output));
 
-    ntt_core_ram #(.LOG_CORE_COUNT(LOG_CORE_COUNT)) lower_ram (
+    core_ram #(.LOG_CORE_COUNT(LOG_CORE_COUNT)) lower_ram (
         .clk(clk),
         .write_select(write_select),
         .write_enable(lower_write_enable),
