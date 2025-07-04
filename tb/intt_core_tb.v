@@ -11,11 +11,14 @@ module intt_core_tb ();
     reg lower_write_enable;
     reg write_select;
     reg read_select;
+    reg input_select;
     reg [1:0]mode;
     reg [8:0]upper_write_address;
     reg [59:0]upper_data_input;
+    reg [59:0]upper_direct_input;
     reg [8:0]lower_write_address;
     reg [59:0]lower_data_input;
+    reg [59:0]lower_direct_input;
     wire [29:0]r1;
     wire [29:0]r2;
     wire [29:0]r3;
@@ -31,11 +34,14 @@ module intt_core_tb ();
         .lower_write_enable(lower_write_enable),
         .write_select(write_select),
         .read_select(read_select),
+        .input_select(input_select),
         .mode(mode),
         .upper_write_address(upper_write_address),
         .upper_data_input(upper_data_input),
+        .upper_direct_input(upper_direct_input),
         .lower_write_address(lower_write_address),
         .lower_data_input(lower_data_input),
+        .lower_direct_input(lower_direct_input),
         .r1(r1),
         .r2(r2),
         .r3(r3),
@@ -53,6 +59,7 @@ module intt_core_tb ();
         lower_write_enable <= 0;
         write_select <= 1;
         read_select <= 0;
+        input_select <= 0;
         upper_write_address <= 0;
         upper_data_input <= 0;
         lower_write_address <= 0;
@@ -136,7 +143,14 @@ module intt_core_tb ();
         upper_read_address <= 0;
         lower_read_address <= 0;
         #100;
-
+        input_select <= 1;
+        upper_direct_input <= 500;
+        lower_direct_input <= 50;
+        #100;
+        upper_direct_input <= 600;
+        lower_direct_input <= 60;
+        #100;
+        input_select <= 0;
     end
 
 endmodule

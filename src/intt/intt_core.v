@@ -11,11 +11,14 @@ module intt_core #(
         input lower_write_enable,
         input write_select,
         input read_select,
+        input input_select,
         input [1:0]mode,
         input [8:0]upper_write_address,
         input [59:0]upper_data_input,
+        input [59:0]upper_direct_input,
         input [8:0]lower_write_address,
         input [59:0]lower_data_input,
+        input [59:0]lower_direct_input,
         output [29:0]r1,
         output [29:0]r2,
         output [29:0]r3,
@@ -23,8 +26,9 @@ module intt_core #(
 
     wire [11:0] upper_twiddle_index, lower_twiddle_index;
     wire [29:0] upper_twiddle, lower_twiddle;
-    reg [29:0] upper_twiddle_reg;
-    reg [29:0] lower_twiddle_reg;
+    reg [29:0] upper_twiddle_reg, lower_twiddle_reg;
+    reg input_select_reg;
+    reg [59:0]upper_direct_input_reg, lower_direct_input_reg;
 
     generate
         if (CORE_INDEX % 2 == 0) begin
@@ -47,6 +51,9 @@ module intt_core #(
     always @(posedge clk) begin
         upper_twiddle_reg <= upper_twiddle;
         lower_twiddle_reg <= lower_twiddle;
+        input_select_reg <= input_select;
+        upper_direct_input_reg <= upper_direct_input;
+        lower_direct_input_reg <= lower_direct_input;
     end
 
     generate
@@ -170,7 +177,10 @@ module intt_core #(
         end
     endgenerate
 
-    wire [59:0]upper_bram_output, lower_bram_output;
+    wire [59:0]upper_bram_output, lower_bram_output, upper_bf_input, lower_bf_input;
+
+    assign upper_bf_input = input_select_reg ? upper_direct_input_reg : upper_bram_output;
+    assign lower_bf_input = input_select_reg ? lower_direct_input_reg : lower_bram_output;
 
     core_ram #(.LOG_CORE_COUNT(LOG_CORE_COUNT)) upper_ram (
         .clk(clk),
@@ -194,8 +204,8 @@ module intt_core #(
 
     gs_butterfly #MOD_INDEX upper_butterfly(
         .clk(clk),
-        .A(upper_bram_output[29:0]),
-        .B(upper_bram_output[59:30]),
+        .A(upper_bf_input[29:0]),
+        .B(upper_bf_input[59:30]),
         .w(upper_twiddle_reg),
         .a(r1),
         .b(r2)
@@ -203,8 +213,8 @@ module intt_core #(
 
     gs_butterfly #MOD_INDEX lower_butterfly(
         .clk(clk),
-        .A(lower_bram_output[29:0]),
-        .B(lower_bram_output[59:30]),
+        .A(lower_bf_input[29:0]),
+        .B(lower_bf_input[59:30]),
         .w(lower_twiddle_reg),
         .a(r3),
         .b(r4)
