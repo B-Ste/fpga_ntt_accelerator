@@ -4,11 +4,10 @@ module intt_core_tb ();
 
     reg clk = 0;
     reg [3:0]log_m;
-    reg [9:0]i;
+    reg [9:0]upper_i, lower_i;
     reg [8:0]upper_read_address;
     reg [8:0]lower_read_address;
-    reg upper_write_enable;
-    reg lower_write_enable;
+    reg write_enable;
     reg write_select;
     reg read_select;
     reg input_select;
@@ -27,11 +26,11 @@ module intt_core_tb ();
     intt_core #(.MOD_INDEX(0), .CORE_INDEX(1), .LOG_CORE_COUNT(4)) dut (
         .clk(clk),
         .log_m(log_m),
-        .i(i),
+        .upper_i(upper_i),
+        .lower_i(lower_i),
         .upper_read_address(upper_read_address),
         .lower_read_address(lower_read_address),
-        .upper_write_enable(upper_write_enable),
-        .lower_write_enable(lower_write_enable),
+        .write_enable(write_enable),
         .write_select(write_select),
         .read_select(read_select),
         .input_select(input_select),
@@ -51,12 +50,12 @@ module intt_core_tb ();
     
     initial begin
         log_m <= 12;
-        i <= 0;
+        upper_i <= 0;
+        lower_i <= 0;
         mode <= 0;
         upper_read_address <= 0;
         lower_read_address <= 0;
-        upper_write_enable <= 0;
-        lower_write_enable <= 0;
+        write_enable <= 0;
         write_select <= 1;
         read_select <= 0;
         input_select <= 0;
@@ -65,9 +64,11 @@ module intt_core_tb ();
         lower_write_address <= 0;
         lower_data_input <= 0;
         #100;
-        i <= 1;
+        upper_i <= 1;
+        lower_i <= 0;
         #100;
-        i <= 0;
+        upper_i <= 0;
+        lower_i <= 1;
         upper_read_address <= 1;
         #100;
         upper_read_address <= 2;
@@ -76,22 +77,27 @@ module intt_core_tb ();
         lower_read_address <= 2;
         #100;
         mode <= 1;
+        lower_i <= 0;
         log_m <= 11;
         #100;
         upper_read_address <= 0;
         lower_read_address <= 0;
         #100;
-        i <= 1;
+        upper_i <= 1;
+        lower_i <= 0;
         #100;
-        i <= 2;
+        upper_i <= 1;
+        lower_i <= 2;
         #100;
-        i <= 0;
+        upper_i <= 0;
+        lower_i <= 0;
         log_m <= 10;
         #100;
         mode <= 2;
         log_m <= 5;
         #100;
-        i <= 1;
+        upper_i <= 1;
+        lower_i <= 1;
         #100;
         upper_read_address <= 1;
         lower_read_address <= 2;
@@ -99,12 +105,12 @@ module intt_core_tb ();
         log_m <= 4;
         #100;
         log_m <= 12;
-        i <= 0;
+        upper_i <= 0;
+        lower_i <= 0;
         mode <= 0;
         upper_read_address <= 0;
         lower_read_address <= 0;
-        upper_write_enable <= 1;
-        lower_write_enable <= 1;
+        write_enable <= 1;
         write_select <= 1;
         read_select <= 0;
         upper_write_address <= 0;

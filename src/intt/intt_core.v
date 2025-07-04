@@ -4,11 +4,11 @@ module intt_core #(
     parameter LOG_CORE_COUNT = 4) (
         input clk,
         input [3:0]log_m,
-        input [9:0]i,
+        input [9:0]upper_i,
+        input [9:0]lower_i,
         input [8:0]upper_read_address,
         input [8:0]lower_read_address,
-        input upper_write_enable,
-        input lower_write_enable,
+        input write_enable,
         input write_select,
         input read_select,
         input input_select,
@@ -33,17 +33,17 @@ module intt_core #(
     generate
         if (CORE_INDEX % 2 == 0) begin
             assign upper_twiddle_index = (mode == 0) ? (1 << (log_m - 1)) + ((CORE_INDEX << log_m) >> (LOG_CORE_COUNT + 1)) + (upper_read_address << 2) : 
-                                         (mode == 1) ? (1 << (log_m - 1)) + ((CORE_INDEX << log_m) >> (LOG_CORE_COUNT + 1)) + (i << 1) : 
+                                         (mode == 1) ? (1 << (log_m - 1)) + ((CORE_INDEX << log_m) >> (LOG_CORE_COUNT + 1)) + (upper_i << 1) : 
                                          (1 << (log_m - 1)) + ((CORE_INDEX << log_m) >> (LOG_CORE_COUNT + 1));
             assign lower_twiddle_index = (mode == 0) ? (1 << (log_m - 1)) + ((CORE_INDEX << log_m) >> (LOG_CORE_COUNT + 1)) + (lower_read_address << 2) + 1 :
-                                         (mode == 1) ? (1 << (log_m - 1)) + ((CORE_INDEX << log_m) >> (LOG_CORE_COUNT + 1)) + (i << 1) : 
+                                         (mode == 1) ? (1 << (log_m - 1)) + ((CORE_INDEX << log_m) >> (LOG_CORE_COUNT + 1)) + (lower_i << 1) : 
                                          (1 << (log_m - 1)) + ((CORE_INDEX << log_m) >> (LOG_CORE_COUNT + 1));
         end else begin
             assign upper_twiddle_index = (mode == 0) ? (1 << (log_m - 1)) + (((CORE_INDEX - 1) << log_m) >> (LOG_CORE_COUNT + 1)) + (upper_read_address << 2) + 2: 
-                                         (mode == 1) ? (1 << (log_m - 1)) + (((CORE_INDEX - 1) << log_m) >> (LOG_CORE_COUNT + 1)) + (i << 1) + 1 : 
+                                         (mode == 1) ? (1 << (log_m - 1)) + (((CORE_INDEX - 1) << log_m) >> (LOG_CORE_COUNT + 1)) + (upper_i << 1) + 1 : 
                                          (1 << (log_m - 1)) + ((CORE_INDEX << log_m) >> (LOG_CORE_COUNT + 1));
             assign lower_twiddle_index = (mode == 0) ? (1 << (log_m - 1)) + (((CORE_INDEX - 1) << log_m) >> (LOG_CORE_COUNT + 1)) + (lower_read_address << 2) + 3 :
-                                         (mode == 1) ? (1 << (log_m - 1)) + (((CORE_INDEX - 1) << log_m) >> (LOG_CORE_COUNT + 1)) + (i << 1) + 1 : 
+                                         (mode == 1) ? (1 << (log_m - 1)) + (((CORE_INDEX - 1) << log_m) >> (LOG_CORE_COUNT + 1)) + (lower_i << 1) + 1 : 
                                          (1 << (log_m - 1)) + ((CORE_INDEX << log_m) >> (LOG_CORE_COUNT + 1));
         end
     endgenerate
@@ -185,7 +185,7 @@ module intt_core #(
     core_ram #(.LOG_CORE_COUNT(LOG_CORE_COUNT)) upper_ram (
         .clk(clk),
         .write_select(write_select),
-        .write_enable(upper_write_enable),
+        .write_enable(write_enable),
         .read_select(read_select),
         .write_address(upper_write_address),
         .data_in(upper_data_input),
@@ -195,7 +195,7 @@ module intt_core #(
     core_ram #(.LOG_CORE_COUNT(LOG_CORE_COUNT)) lower_ram (
         .clk(clk),
         .write_select(write_select),
-        .write_enable(lower_write_enable),
+        .write_enable(write_enable),
         .read_select(read_select),
         .write_address(lower_write_address),
         .data_in(lower_data_input),
