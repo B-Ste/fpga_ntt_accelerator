@@ -7,33 +7,44 @@ module intt_processor #(
         input start,
         input [59:0]data_in[(1 << LOG_CORE_COUNT) - 1:0][1:0],
         output [59:0]out[(1 << LOG_CORE_COUNT) - 1:0][1:0],
-        output [8:0]address_out
+        output [8:0]address_out,
+        output output_active
     );
 
     reg [3:0]log_m, log_t;
     reg [9:0]upper_i, lower_i;
     reg [8:0]upper_read_address, lower_read_address;
     reg write_enable, write_select, read_select, input_select;
-    reg [1:0]mode;
+    reg [1:0]mode = STANDBY;
+
+    localparam OA_STAGES = 8;
+    reg output_active_pipe[OA_STAGES:0];
+    assign output_active = output_active_pipe[OA_STAGES];
+
+    integer f;
+    always @(posedge clk) begin
+        for (f = 0; f < OA_STAGES; f = f + 1) begin
+            output_active_pipe[f + 1] <= output_active_pipe[f];
+        end
+    end
 
     // pipeline delay to enable writing to the brams only when valid values are present
-    localparam WRITE_PIPE_STAGES = 10;
+    localparam WRITE_PIPE_STAGES = 7;
     reg write_enable_pipe[WRITE_PIPE_STAGES:0];
     reg write_select_pipe[WRITE_PIPE_STAGES:0];
 
-    integer f;
     always @(posedge clk) begin
         write_enable_pipe[0] <= write_enable;
         write_select_pipe[0] <= write_select;
 
-        for (f = 0; f < WRITE_ENABLE_PIPE_STAGES; f = f + 1) begin
+        for (f = 0; f < WRITE_PIPE_STAGES; f = f + 1) begin
             write_enable_pipe[f + 1] <= write_enable_pipe[f];
             write_select_pipe[f + 1] <= write_select_pipe[f];
         end
     end
 
     reg [29:0]core_output[(1 << LOG_CORE_COUNT) - 1:0][3:0];
-    reg [8:0]upper_write_address, lower_write_address;
+    reg [8:0]write_address[(1 << LOG_CORE_COUNT) - 1:0][1:0];
     reg [59:0]core_input[(1 << LOG_CORE_COUNT) - 1:0][1:0];
 
     localparam LOG_N = 12;
@@ -64,17 +75,17 @@ module intt_processor #(
             end
             ALG_SECOND_STAGE: begin
                 if (upper_read_address == j2) begin
-                    if (upper_i == ((1 << (log_m - 2 - LOG_CORE_COUNT)) - 1)) begin
+                    if (upper_i == ((1 << (log_m - 1 - LOG_CORE_COUNT)) - 1)) begin
                         log_m <= log_m - 1;
-                        lot_t <= log_t + 1;
+                        log_t <= log_t + 1;
                         read_select <= ~read_select;
                         write_select <= ~write_select;
-                        if (log_t == LOG_N - 2 - LOG_CORE_COUNT) begin
+                        if ((log_t + 1) == (LOG_N - 2 - LOG_CORE_COUNT)) begin
                             // switch to third part of algorithm
                             mode <= ALG_THIRD_STAGE;
                             upper_read_address <= 0;
                             lower_read_address <= 0;
-                            j2 <= (1 << (LOG_N - 2 - LOG_CORE_COUNT));
+                            j2 <= (1 << (LOG_N - 2 - LOG_CORE_COUNT)) - 1;
                         end else begin
                             // stay in part two, but start i loop new
                             upper_i <= 0;
@@ -84,7 +95,7 @@ module intt_processor #(
                             lower_read_address <= 1 << (log_t + 1);
                         end
                     end else begin
-                        if (lower_i == ((1 << (log_m - 2 - LOG_CORE_COUNT)) - 1)) begin
+                        if (lower_i == ((1 << (log_m - 1 - LOG_CORE_COUNT)) - 1)) begin
                             // switch parity of i's
                             upper_i <= 1;
                             upper_read_address <= 1 << log_t;
@@ -121,11 +132,13 @@ module intt_processor #(
                         write_select <= ~write_select;
                     end
                 end else begin
+                    if (log_m == 1) output_active_pipe[0] <= 1;
                     upper_read_address <= upper_read_address + 1;
                     lower_read_address <= lower_read_address + 1;
                 end
             end
             STANDBY: begin
+                output_active_pipe[0] <= 0;
                 if (start) begin
                     mode <= ALG_FIRST_STAGE;
                     log_m <= 12;
@@ -136,6 +149,7 @@ module intt_processor #(
                     lower_read_address <= 0;
                     read_select <= 0;
                     write_select <= 0;
+                    write_enable <= 1;
                     input_select <= 1;
                     j2 <= (1 << (LOG_N - 2 - LOG_CORE_COUNT)) - 1;
                 end
@@ -153,15 +167,15 @@ module intt_processor #(
                 .lower_i(lower_i),
                 .upper_read_address(upper_read_address),
                 .lower_read_address(lower_read_address),
-                .write_enable(write_enable),
+                .write_enable(write_enable_pipe[WRITE_PIPE_STAGES]),
                 .write_select(write_select_pipe[WRITE_PIPE_STAGES]),
                 .read_select(read_select),
                 .input_select(input_select),
                 .mode(mode),
-                .upper_write_address(upper_write_address),
+                .upper_write_address(write_address[k][0]),
                 .upper_data_input(core_input[k][0]),
                 .upper_direct_input(data_in[k][0]),
-                .lower_write_address(lower_write_address),
+                .lower_write_address(write_address[k][1]),
                 .lower_data_input(core_input[k][1]),
                 .lower_direct_input(data_in[k][1]),
                 .r1(core_output[k][0]),
@@ -173,12 +187,12 @@ module intt_processor #(
     endgenerate
 
     // pipeline delay to feed router correct values
-    localparam ROUTER_INPUT_PIPE_STAGES = 7;
+    localparam ROUTER_INPUT_PIPE_STAGES = 6;
 
-    reg [3:0]log_m_pipe[ROUTER_INPUT_PIPE_STAGES:0];
-    reg [3:0]log_t_pipe[ROUTER_INPUT_PIPE_STAGES:0];
-    reg [8:0]upper_read_address_pipe[ROUTER_INPUT_PIPE_STAGES:0];
-    reg [8:0]lower_read_address_pipe[ROUTER_INPUT_PIPE_STAGES:0];
+    reg [3:0]log_m_pipe[ROUTER_INPUT_PIPE_STAGES + 1:0];
+    reg [3:0]log_t_pipe[ROUTER_INPUT_PIPE_STAGES + 1:0];
+    reg [8:0]upper_read_address_pipe[ROUTER_INPUT_PIPE_STAGES + 1:0];
+    reg [8:0]lower_read_address_pipe[ROUTER_INPUT_PIPE_STAGES + 1:0];
 
     always @(posedge clk) begin
         log_m_pipe[0] <= log_m;
@@ -186,7 +200,7 @@ module intt_processor #(
         upper_read_address_pipe[0] <= upper_read_address;
         lower_read_address_pipe[0] <= lower_read_address;
 
-        for (f = 0; f < ROUTER_INPUT_PIPE_STAGES; f = f + 1) begin
+        for (f = 0; f < ROUTER_INPUT_PIPE_STAGES + 1; f = f + 1) begin
             log_m_pipe[f + 1] <= log_m_pipe[f];
             log_t_pipe[f + 1] <= log_t_pipe[f];
             upper_read_address_pipe[f + 1] <= upper_read_address_pipe[f];
@@ -198,12 +212,58 @@ module intt_processor #(
         .clk(clk),
         .log_m(log_m_pipe[ROUTER_INPUT_PIPE_STAGES]),
         .log_t(log_t_pipe[ROUTER_INPUT_PIPE_STAGES]),
-        .address_in('{upper_read_address_pipe[ROUTER_INPUT_PIPE_STAGES], lower_read_address_pipe[ROUTER_INPUT_PIPE_STAGES]}),
+        .address_in('{lower_read_address_pipe[ROUTER_INPUT_PIPE_STAGES], upper_read_address_pipe[ROUTER_INPUT_PIPE_STAGES]}),
         .in(core_output),
         .loop(core_input),
-        .address_loop('{upper_write_address, lower_write_address}),
+        .address_loop(write_address),
         .out(out),
         .address_out(address_out)
     );
+
+    integer fd;
+    integer r;
+    reg [8 * 100:0]str;
+
+    initial begin
+        fd = $fopen("tracing.txt", "w");
+        $fclose(fd);
+    end
+
+    always @(posedge clk) begin
+        if (mode != STANDBY || output_active) begin
+            fd = $fopen("tracing.txt", "a");
+            for (r = 0; r < (1 << LOG_CORE_COUNT); r = r + 1) begin
+                $sformat(str, "m=%0d j=%0d k=%0d r1=%0d", (1 << log_m_pipe[ROUTER_INPUT_PIPE_STAGES]), upper_read_address_pipe[ROUTER_INPUT_PIPE_STAGES], r, core_output[r][0]);
+                $fdisplay(fd, "%0s", str);
+                $sformat(str, "m=%0d j=%0d k=%0d r2=%0d", (1 << log_m_pipe[ROUTER_INPUT_PIPE_STAGES]), upper_read_address_pipe[ROUTER_INPUT_PIPE_STAGES], r, core_output[r][1]);
+                $fdisplay(fd, "%0s", str);
+                $sformat(str, "m=%0d j=%0d k=%0d r3=%0d", (1 << log_m_pipe[ROUTER_INPUT_PIPE_STAGES]), lower_read_address_pipe[ROUTER_INPUT_PIPE_STAGES], r, core_output[r][2]);
+                $fdisplay(fd, "%0s", str);
+                $sformat(str, "m=%0d j=%0d k=%0d r4=%0d", (1 << log_m_pipe[ROUTER_INPUT_PIPE_STAGES]), lower_read_address_pipe[ROUTER_INPUT_PIPE_STAGES], r, core_output[r][3]);
+                $fdisplay(fd, "%0s", str);
+            end
+            $fclose(fd);
+        end
+    end
+
+/*
+    initial begin
+        fd = $fopen("input.txt", "w");
+        $fclose(fd);
+    end
+
+    integer fd_in;
+    always @(posedge clk) begin
+        if (mode != STANDBY) begin
+            fd_in = $fopen("input.txt", "a");
+            for (r = 0; r < (1 << LOG_CORE_COUNT); r = r + 1) begin
+                $sformat(str, "m=%0d j=%0d k=%0d r1=%0d", (1 << log_m_pipe[ROUTER_INPUT_PIPE_STAGES - 3]), router_address_loop[0], r, router_loop[f][0]);
+                $fdisplay(fd_in, "%0s", str);
+                $sformat(str, "m=%0d j=%0d k=%0d r2=%0d", (1 << log_m_pipe[ROUTER_INPUT_PIPE_STAGES - 3]), router_address_loop[1], r, router_loop[f][1]);
+                $fdisplay(fd_in, "%0s", str);
+            end
+            $fclose(fd_in);
+        end
+    end*/
 
 endmodule

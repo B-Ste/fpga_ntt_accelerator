@@ -15,6 +15,7 @@ tb/processor_test/**/*.jou
 tb/processor_test/**/*.log
 tb/processor_test/output_test/ntt_bench_bar
 tb/router_test/**/*.txt
+tb/intt_processor_test/**/*.txt
 !tcl/
 !cst/
 !cst/*
