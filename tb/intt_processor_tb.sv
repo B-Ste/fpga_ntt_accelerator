@@ -26,25 +26,31 @@ module intt_processor_tb();
     integer i;
     integer k;
     integer fd_out;
+    integer fd_in;
+    reg [59:0]input_coe0, input_coe1;
     initial begin
-        fd_out = $fopen("output.txt", "w");
+        fd_out = $fopen("output_processor.txt", "w");
+        fd_in = $fopen("input.txt", "r");
         #100;
         start = 1;
         #100;
         for (i = 0; i < (1 << (LOG_N - 2 - LOG_CORE_COUNT)); i = i + 1) begin
             for (k = 0; k < (1 << LOG_CORE_COUNT); k = k + 1) begin
-                data_in[k][0] <= (k * (1 << (LOG_N - 2 - LOG_CORE_COUNT))) + i;
-                data_in[k][1] <= (k * (1 << (LOG_N - 2 - LOG_CORE_COUNT))) + i + 1024;
+                $fscanf(fd_in, "%0d", input_coe0);
+                $fscanf(fd_in, "%0d", input_coe1);
+                data_in[k][0] = input_coe0;
+                data_in[k][1] = input_coe1;
             end
             #100;
         end
         $fclose(fd_out);
+        $fclose(fd_in);
         start = 0;
     end
 
     always @(posedge clk) begin
         if (output_active) begin
-            fd_out = $fopen("output.txt", "a");
+            fd_out = $fopen("output_processor.txt", "a");
             for (i = 0; i < (1 << LOG_CORE_COUNT); i = i + 1) begin
                 $fdisplay(fd_out, out[i][0][29:0]);
                 $fdisplay(fd_out, out[i][0][59:30]);

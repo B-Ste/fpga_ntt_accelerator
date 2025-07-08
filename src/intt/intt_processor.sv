@@ -17,7 +17,8 @@ module intt_processor #(
     reg write_enable, write_select, read_select, input_select;
     reg [1:0]mode = STANDBY;
 
-    localparam OA_STAGES = 8;
+    // pipeline delay to wait for valid output
+    localparam OA_STAGES = 11;
     reg output_active_pipe[OA_STAGES:0];
     assign output_active = output_active_pipe[OA_STAGES];
 
@@ -157,6 +158,27 @@ module intt_processor #(
         endcase
     end
 
+    wire [59:0]router_out[(1 << LOG_CORE_COUNT) - 1:0][1:0];
+    wire [29:0]n_neg;
+
+    generate
+        case (MOD_INDEX)
+            0 : assign n_neg = 1063062001;
+            1 : assign n_neg = 1063193041;
+            2 : assign n_neg = 1064437921;
+            3 : assign n_neg = 1065224161;
+            4 : assign n_neg = 1065551761;
+            5 : assign n_neg = 1067976001;
+            6 : assign n_neg = 1068172561;
+            7 : assign n_neg = 1068303601;
+            8 : assign n_neg = 1068958801;
+            9 : assign n_neg = 1070465761;
+            10: assign n_neg = 1071252001;
+            11: assign n_neg = 1072234801;
+            12: assign n_neg = 1073217601;
+        endcase
+    endgenerate
+
     genvar k;
     generate
         for (k = 0; k < (1 << LOG_CORE_COUNT); k = k + 1) begin
@@ -183,16 +205,49 @@ module intt_processor #(
                 .r3(core_output[k][2]),
                 .r4(core_output[k][3])
             );
+
+            modular_multiplier #(.MOD_INDEX(MOD_INDEX)) m1 (
+                .clk(clk), 
+                .a(router_out[k][0][29:0]), 
+                .b(n_neg), 
+                .c(out[k][0][29:0])
+            );
+
+            modular_multiplier #(.MOD_INDEX(MOD_INDEX)) m2 (
+                .clk(clk), 
+                .a(router_out[k][0][59:30]), 
+                .b(n_neg), 
+                .c(out[k][0][59:30])
+            );
+
+            modular_multiplier #(.MOD_INDEX(MOD_INDEX)) m3 (
+                .clk(clk), 
+                .a(router_out[k][1][29:0]), 
+                .b(n_neg), 
+                .c(out[k][1][29:0])
+            );
+
+            modular_multiplier #(.MOD_INDEX(MOD_INDEX)) m4 (
+                .clk(clk), 
+                .a(router_out[k][1][59:30]), 
+                .b(n_neg), 
+                .c(out[k][1][59:30])
+            );
         end
     endgenerate
 
     // pipeline delay to feed router correct values
     localparam ROUTER_INPUT_PIPE_STAGES = 6;
-
     reg [3:0]log_m_pipe[ROUTER_INPUT_PIPE_STAGES + 1:0];
     reg [3:0]log_t_pipe[ROUTER_INPUT_PIPE_STAGES + 1:0];
     reg [8:0]upper_read_address_pipe[ROUTER_INPUT_PIPE_STAGES + 1:0];
     reg [8:0]lower_read_address_pipe[ROUTER_INPUT_PIPE_STAGES + 1:0];
+
+    // pipeline delay to wait for last multiplication before outputting addresses
+    localparam ADDRESS_OUT_PIPE_STAGES = 3;
+    wire [8:0]router_address_out;
+    reg [8:0]address_out_pipe[ADDRESS_OUT_PIPE_STAGES:0];
+    assign address_out = address_out_pipe[ADDRESS_OUT_PIPE_STAGES];
 
     always @(posedge clk) begin
         log_m_pipe[0] <= log_m;
@@ -206,6 +261,11 @@ module intt_processor #(
             upper_read_address_pipe[f + 1] <= upper_read_address_pipe[f];
             lower_read_address_pipe[f + 1] <= lower_read_address_pipe[f];
         end
+
+        address_out_pipe[0] <= router_address_out;
+        for (f = 0; f < ADDRESS_OUT_PIPE_STAGES; f = f + 1) begin
+            address_out_pipe[f + 1] <= address_out_pipe[f];
+        end
     end
 
     intt_router #(.LOG_CORE_COUNT(LOG_CORE_COUNT)) router (
@@ -216,10 +276,11 @@ module intt_processor #(
         .in(core_output),
         .loop(core_input),
         .address_loop(write_address),
-        .out(out),
-        .address_out(address_out)
+        .out(router_out),
+        .address_out(router_address_out)
     );
 
+/*
     integer fd;
     integer r;
     reg [8 * 100:0]str;
@@ -246,7 +307,6 @@ module intt_processor #(
         end
     end
 
-/*
     initial begin
         fd = $fopen("input.txt", "w");
         $fclose(fd);
