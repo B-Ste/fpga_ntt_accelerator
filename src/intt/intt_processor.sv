@@ -45,7 +45,7 @@ module intt_processor #(
     end
 
     reg [29:0]core_output[(1 << LOG_CORE_COUNT) - 1:0][3:0];
-    reg [8:0]write_address[(1 << LOG_CORE_COUNT) - 1:0][1:0];
+    reg [8:0]write_address[1:0];
     reg [59:0]core_input[(1 << LOG_CORE_COUNT) - 1:0][1:0];
 
     localparam LOG_N = 12;
@@ -182,7 +182,8 @@ module intt_processor #(
     genvar k;
     generate
         for (k = 0; k < (1 << LOG_CORE_COUNT); k = k + 1) begin
-            intt_core #(.MOD_INDEX(MOD_INDEX), .CORE_INDEX(k), .LOG_CORE_COUNT(LOG_CORE_COUNT)) core (
+            if ((k % 2) == 0) begin
+                intt_core #(.MOD_INDEX(MOD_INDEX), .CORE_INDEX(k), .LOG_CORE_COUNT(LOG_CORE_COUNT)) core (
                 .clk(clk),
                 .log_m(log_m),
                 .upper_i(upper_i),
@@ -194,10 +195,10 @@ module intt_processor #(
                 .read_select(read_select),
                 .input_select(input_select),
                 .mode(mode),
-                .upper_write_address(write_address[k][0]),
+                .upper_write_address(write_address[0]),
                 .upper_data_input(core_input[k][0]),
                 .upper_direct_input(data_in[k][0]),
-                .lower_write_address(write_address[k][1]),
+                .lower_write_address(write_address[0]),
                 .lower_data_input(core_input[k][1]),
                 .lower_direct_input(data_in[k][1]),
                 .r1(core_output[k][0]),
@@ -205,6 +206,31 @@ module intt_processor #(
                 .r3(core_output[k][2]),
                 .r4(core_output[k][3])
             );
+            end else begin
+                intt_core #(.MOD_INDEX(MOD_INDEX), .CORE_INDEX(k), .LOG_CORE_COUNT(LOG_CORE_COUNT)) core (
+                .clk(clk),
+                .log_m(log_m),
+                .upper_i(upper_i),
+                .lower_i(lower_i),
+                .upper_read_address(upper_read_address),
+                .lower_read_address(lower_read_address),
+                .write_enable(write_enable_pipe[WRITE_PIPE_STAGES]),
+                .write_select(write_select_pipe[WRITE_PIPE_STAGES]),
+                .read_select(read_select),
+                .input_select(input_select),
+                .mode(mode),
+                .upper_write_address(write_address[1]),
+                .upper_data_input(core_input[k][0]),
+                .upper_direct_input(data_in[k][0]),
+                .lower_write_address(write_address[1]),
+                .lower_data_input(core_input[k][1]),
+                .lower_direct_input(data_in[k][1]),
+                .r1(core_output[k][0]),
+                .r2(core_output[k][1]),
+                .r3(core_output[k][2]),
+                .r4(core_output[k][3])
+            );
+            end
 
             modular_multiplier #(.MOD_INDEX(MOD_INDEX)) m1 (
                 .clk(clk), 
@@ -280,7 +306,7 @@ module intt_processor #(
         .address_out(router_address_out)
     );
 
-/*
+    /*
     integer fd;
     integer r;
     reg [8 * 100:0]str;

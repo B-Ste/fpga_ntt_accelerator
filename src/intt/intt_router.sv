@@ -7,7 +7,7 @@ module intt_router #(parameter LOG_CORE_COUNT = 5) (
     input [8:0]address_in[1:0],
     input [29:0]in[(1 << LOG_CORE_COUNT) - 1:0][3:0],
     output reg [59:0]loop[(1 << LOG_CORE_COUNT) - 1:0][1:0],
-    output reg [8:0]address_loop[(1 << LOG_CORE_COUNT) - 1:0][1:0],
+    output reg [8:0]address_loop[1:0],
     output reg [59:0]out[(1 << LOG_CORE_COUNT) - 1:0][1:0],
     output reg [8:0]address_out);
 
@@ -20,33 +20,29 @@ module intt_router #(parameter LOG_CORE_COUNT = 5) (
                 // First phase: first iteration of computation where custom routing is required
                 loop[k][0] <= {in[k][2], in[k][0]};
                 loop[k][1] <= {in[k][3], in[k][1]};
-                address_loop[k][0] <= address_in[0];
-                address_loop[k][1] <= address_in[1];
+                address_loop[0] <= address_in[0];
+                address_loop[1] <= address_in[1];
             end else if (log_t < (LOG_N - (LOG_CORE_COUNT + 2))) begin
                 // Second phase 
                 if ((k & 1) == 0) begin
                     if ((address_in[0] & ((1 << (log_t + 1)) - 1)) < (1 << log_t)) begin
                         loop[k][0] <= {in[k + 1][0], in[k][0]};
                         loop[k][1] <= {in[k + 1][1], in[k][1]};
-                        address_loop[k][0] <= address_in[0];
-                        address_loop[k][1] <= address_in[0];
+                        address_loop[0] <= address_in[0];
                     end else begin
                         loop[k + 1][0] <= {in[k + 1][0], in[k][0]};
                         loop[k + 1][1] <= {in[k + 1][1], in[k][1]};
-                        address_loop[k + 1][0] <= address_in[0] - (1 << log_t);
-                        address_loop[k + 1][1] <= address_in[0] - (1 << log_t);
+                        address_loop[1] <= address_in[0] - (1 << log_t);
                     end
                 end else begin
                     if ((address_in[1] & ((1 << (log_t + 1)) - 1)) < (1 << log_t)) begin
                         loop[k - 1][0] <= {in[k][2], in[k - 1][2]};
                         loop[k - 1][1] <= {in[k][3], in[k - 1][3]};
-                        address_loop[k - 1][0] <= address_in[1] + (1 << log_t);
-                        address_loop[k - 1][1] <= address_in[1] + (1 << log_t);
+                        address_loop[0] <= address_in[1] + (1 << log_t);
                     end else begin
                         loop[k][0] <= {in[k][2], in[k - 1][2]};
                         loop[k][1] <= {in[k][3], in[k - 1][3]};
-                        address_loop[k][0] <= address_in[1];
-                        address_loop[k][1] <= address_in[1];
+                        address_loop[1] <= address_in[1];
                     end
                 end
             end else begin
@@ -60,8 +56,8 @@ module intt_router #(parameter LOG_CORE_COUNT = 5) (
                         loop[k][0] <= {in[k][2], in[k - ((1 << (log_t + LOG_CORE_COUNT + 2)) >> LOG_N)][2]};
                         loop[k][1] <= {in[k][3], in[k - ((1 << (log_t + LOG_CORE_COUNT + 2)) >> LOG_N)][3]};                        
                     end
-                    address_loop[k][0] <= address_in[0];
-                    address_loop[k][1] <= address_in[1];
+                    address_loop[0] <= address_in[0];
+                    address_loop[1] <= address_in[1];
                 end else begin
                     // after last iteration of third phase, output computed coefficients 
                     out[k][0] <= {in[k][1], in[k][0]};
