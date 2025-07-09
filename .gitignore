@@ -16,6 +16,9 @@ tb/processor_test/**/*.log
 tb/processor_test/output_test/ntt_bench_bar
 tb/router_test/**/*.txt
 tb/intt_processor_test/**/*.txt
+tb/intt_processor_test/output_test/ntt_bench_bar
+tb/nwc_processor_test/*.txt
+tb/nwc_processor_test/ntt_bench_bar
 !tcl/
 !cst/
 !cst/*

@@ -4,15 +4,16 @@ Q=0
 
 # Define directories
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-XSIM_DIR="$SCRIPT_DIR/../../../project_ntt_accelerator/project_ntt_accelerator.sim/sim_ntt_processor_tb/behav/xsim"
+XSIM_DIR="$SCRIPT_DIR/../../project_ntt_accelerator/project_ntt_accelerator.sim/sim_nwc_processor_tb/behav/xsim"
 
 # Step 1: Run the executable and supply inputs 8 and 0
-echo "Running ntt_bench_bar with inputs 8 and $Q..."
-echo -e "8\n$Q" | "$SCRIPT_DIR/ntt_bench_bar" > /dev/null
+echo "Running ntt_bench_bar with inputs 11 and $Q..."
+echo -e "11\n$Q" | "$SCRIPT_DIR/ntt_bench_bar" > /dev/null
 
 # Step 2: Move input.txt to Vivado simulation directory
 echo "Moving input.txt to Vivado simulation directory..."
-mv "$SCRIPT_DIR/input.txt" "$XSIM_DIR/"
+mv "$SCRIPT_DIR/input1.txt" "$XSIM_DIR/"
+mv "$SCRIPT_DIR/input2.txt" "$XSIM_DIR/"
 
 # Step 3: Run Vivado simulation for 450us
 echo "Starting Vivado simulation for 450us..."
