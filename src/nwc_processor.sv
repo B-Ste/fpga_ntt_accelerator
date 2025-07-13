@@ -24,7 +24,7 @@ module nwc_processor(
     // NTT processor 0
     wire output_active0;
     wire [59:0]out0[(1 << LOG_CORE_COUNT) - 1:0][1:0];
-    wire [8:0]address_out0;
+    wire [(9 - LOG_CORE_COUNT):0]address_out0;
     ntt_processor #(.MOD_INDEX(MOD_INDEX), .LOG_CORE_COUNT(LOG_CORE_COUNT)) ntt0 (
         .clk(clk),
         .write_enable(write_enable),
@@ -39,7 +39,7 @@ module nwc_processor(
     // NTT processor 1
     wire output_active1;
     wire [59:0]out1[(1 << LOG_CORE_COUNT) - 1:0][1:0];
-    wire [8:0]address_out1;
+    wire [(9 - LOG_CORE_COUNT):0]address_out1;
     ntt_processor #(.MOD_INDEX(MOD_INDEX), .LOG_CORE_COUNT(LOG_CORE_COUNT)) ntt1 (
         .clk(clk),
         .write_enable(write_enable),
@@ -90,7 +90,7 @@ module nwc_processor(
     // INTT processor with input signal controls
     wire intt_start;
     wire [59:0]intt_out[(1 << LOG_CORE_COUNT) - 1:0][1:0];
-    wire [8:0]intt_address_out;
+    wire [(9 - LOG_CORE_COUNT):0]intt_address_out;
     wire intt_output_active;
 
     // delay start signal to intt processor to account for multiplication
@@ -116,16 +116,29 @@ module nwc_processor(
 
     localparam LOG_N = 12;
     localparam HEIGHT = 1 << (LOG_N - (LOG_CORE_COUNT + 2));
-    (* ram_style = "block" *) reg [59:0]output_memory[(1 << LOG_CORE_COUNT) - 1:0][HEIGHT - 1:0][1:0];
 
-    always @(posedge clk) begin
-        for (f = 0; f < (1 << LOG_CORE_COUNT); f = f + 1) begin
-            output_memory[f][intt_address_out][0] <= intt_out[f][0];
-            output_memory[f][intt_address_out][1] <= intt_out[f][1];
+    wire [59:0]output_memory[(1 << LOG_CORE_COUNT) - 1:0][1:0];
+    genvar r;
+    generate
+        for (r = 0; r < (1 << LOG_CORE_COUNT); r = r + 1) begin
+            (* ram_style = "block" *) reg [59:0]upper_output_mem[HEIGHT - 1:0];
+            (* ram_style = "block" *) reg [59:0]lower_output_mem[HEIGHT - 1:0];
+
+            always @(posedge clk) begin
+                upper_output_mem[intt_address_out] <= intt_out[r][0];
+            end
+
+            always @(posedge clk) begin
+                lower_output_mem[intt_address_out] <= intt_out[r][1];
+            end
+
+            assign output_memory[r][0] = upper_output_mem[output_address[(LOG_N - (LOG_CORE_COUNT + 2)) - 1:0]];
+
+            assign output_memory[r][1] = lower_output_mem[output_address[(LOG_N - (LOG_CORE_COUNT + 2)) - 1:0]];
         end
-    end
+    endgenerate
 
-    // control result output
+    // control result output and assign fitting memory contents to data output
     reg [10:0]output_address = 0;
     reg intt_output_active_pipe[1:0] = '{0, 0};
     assign output_active = intt_output_active_pipe[1];
@@ -136,9 +149,9 @@ module nwc_processor(
             for (f = 0; f < (1 << LOG_CORE_COUNT); f = f + 1) begin
                 if (f == output_address[9:(9 - LOG_CORE_COUNT + 1)]) begin
                     if (output_address[10] == 0) begin
-                        data_out <= output_memory[f][output_address[(LOG_N - (LOG_CORE_COUNT + 2)) - 1:0]][0];
+                        data_out <= output_memory[f][0];
                     end else begin
-                        data_out <= output_memory[f][output_address[(LOG_N - (LOG_CORE_COUNT + 2)) - 1:0]][1];
+                        data_out <= output_memory[f][1];
                     end
                 end
             end
