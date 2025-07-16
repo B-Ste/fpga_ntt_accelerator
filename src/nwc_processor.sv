@@ -1,6 +1,8 @@
 `timescale 1ns / 1ps
 
-module nwc_processor(
+module nwc_processor #(
+    parameter MOD_INDEX = 0,
+    parameter LOG_CORE_COUNT = 3)(
     input clk,
     input [59:0]data_in0,
     input [59:0]data_in1,
@@ -9,9 +11,6 @@ module nwc_processor(
     output reg [59:0]data_out,
     output output_active
     );
-
-    localparam MOD_INDEX = 0;
-    localparam LOG_CORE_COUNT = 4;
 
     // generate write addresses for ntt processors to save on input ports
     reg [10:0]address_in = 0;

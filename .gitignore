@@ -22,3 +22,6 @@ tb/nwc_processor_test/ntt_bench_bar
 !tcl/
 !cst/
 !cst/*
+!bd
+!bd/blockdesign
+!bd/blockdesign/blockdesign.bd
