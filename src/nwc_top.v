@@ -17,7 +17,7 @@ module nwc_top #(
     //interface output-RAM
     output [10:0]addrw,
     output [63:0]data_out,
-    output [7:0]out_wen,
+    output [3:0]out_wen,
     output reg done = 0
     );
 
@@ -52,22 +52,26 @@ module nwc_top #(
         .output_active(output_active)
         );
 
-    assign data_out = {4'd0, processor_data_out};
+    assign data_out = {2'd0, processor_data_out[59:32], 2'd0, processor_data_out[31:0]};
 
-    reg [10:0]addrr_reg = 0;
-    reg [10:0]addrw_reg = 0;
+    reg [10:0]addrr_reg;
+    reg [10:0]addrw_reg;
+
+    initial begin
+        addrr_reg <= 0;
+        addrw_reg <= 0;
+    end
 
     assign addr0 = addrr_reg;
     assign addr1 = addrr_reg;
     assign addrw = addrw_reg;
-    assign out_wen = output_active ? 7'b1111111 : 0; 
+    assign out_wen = output_active ? 4'b1111 : 0; 
 
     reg input_state = 0;
     always @(posedge clk) begin
         case (input_state)
             0 : begin
                 addrr_reg <= 0;
-                addrw_reg <= 0;
                 processor_start[0] <= 0;
                 if (start) begin
                     input_state <= 1;
@@ -93,6 +97,8 @@ module nwc_top #(
         if (output_active) begin
             addrw_reg <= addrw_reg + 1;
             done <= 0;
+        end else begin
+            addrw_reg <= 0;
         end
         if (addrw_reg == 2047) begin
             done <= 1;
