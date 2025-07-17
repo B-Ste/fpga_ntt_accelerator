@@ -9,7 +9,8 @@ module nwc_processor #(
     input write_enable,
     input start,
     output reg [59:0]data_out,
-    output output_active
+    output output_active,
+    output ready
     );
 
     // generate write addresses for ntt processors to save on input ports
@@ -32,11 +33,12 @@ module nwc_processor #(
         .data_in(data_in0),
         .output_active(output_active0),
         .out(out0),
-        .address_out(address_out0)
+        .address_out(address_out0),
+        .ready(ready)
     );
 
     // NTT processor 1
-    wire output_active1;
+    wire output_active1, ready1;
     wire [59:0]out1[(1 << LOG_CORE_COUNT) - 1:0][1:0];
     wire [(9 - LOG_CORE_COUNT):0]address_out1;
     ntt_processor #(.MOD_INDEX(MOD_INDEX), .LOG_CORE_COUNT(LOG_CORE_COUNT)) ntt1 (
@@ -47,7 +49,8 @@ module nwc_processor #(
         .data_in(data_in1),
         .output_active(output_active1),
         .out(out1),
-        .address_out(address_out1)
+        .address_out(address_out1),
+        .ready(ready1)
     );
 
     // multiplier array

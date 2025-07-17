@@ -9,6 +9,7 @@ module ntt_processor_tb();
     wire output_active;
     wire [59:0]out[(1 << LOG_CORE_COUNT) - 1:0][1:0];
     wire [8:0]address_out;
+    wire ready;
     
     ntt_processor #(.MOD_INDEX(0), .LOG_CORE_COUNT(LOG_CORE_COUNT)) dut (
         .clk(clk),
@@ -18,7 +19,8 @@ module ntt_processor_tb();
         .data_in(data_in),
         .output_active(output_active),
         .out(out),
-        .address_out(address_out)
+        .address_out(address_out),
+        .ready(ready)
     );
     
     always #50 clk = ~clk;

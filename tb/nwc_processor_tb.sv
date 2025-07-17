@@ -6,7 +6,7 @@ module nwc_processor_tb();
     reg [59:0]data_in0, data_in1;
     reg write_enable, start;
     wire [59:0]data_out;
-    wire output_active;
+    wire output_active, ready;
 
     nwc_processor dut (
         .clk(clk),
@@ -15,7 +15,8 @@ module nwc_processor_tb();
         .write_enable(write_enable),
         .start(start),
         .data_out(data_out),
-        .output_active(output_active)
+        .output_active(output_active),
+        .ready(ready)
     );
 
     always #50 clk = ~clk;

@@ -8,7 +8,8 @@ module ntt_processor #(
         input [59:0]data_in,
         output output_active,
         output [59:0]out[(1 << LOG_CORE_COUNT) - 1:0][1:0],
-        output [8:0]address_out
+        output [8:0]address_out,
+        output ready
     );
     
     localparam PIPE_STAGES = 10;
@@ -48,6 +49,7 @@ module ntt_processor #(
     integer t;
     
     assign output_active = output_active_pipe[PIPE_STAGES - 2];
+    assign ready = (mode == STANDBY);
 
     /*
     integer fd;
