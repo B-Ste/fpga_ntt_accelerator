@@ -17,8 +17,10 @@ module intt_processor #(
     reg write_enable, write_select, read_select, input_select;
     reg [1:0]mode = STANDBY;
 
+    localparam PIPE_STAGES = 12;
+
     // pipeline delay to wait for valid output
-    localparam OA_STAGES = 11;
+    localparam OA_STAGES = PIPE_STAGES;
     reg output_active_pipe[OA_STAGES:0];
     assign output_active = output_active_pipe[OA_STAGES];
 
@@ -30,7 +32,7 @@ module intt_processor #(
     end
 
     // pipeline delay to enable writing to the brams only when valid values are present
-    localparam WRITE_PIPE_STAGES = 7;
+    localparam WRITE_PIPE_STAGES = PIPE_STAGES - 4;
     reg write_enable_pipe[WRITE_PIPE_STAGES:0];
     reg write_select_pipe[WRITE_PIPE_STAGES:0];
 
@@ -263,14 +265,14 @@ module intt_processor #(
     endgenerate
 
     // pipeline delay to feed router correct values
-    localparam ROUTER_INPUT_PIPE_STAGES = 6;
+    localparam ROUTER_INPUT_PIPE_STAGES = PIPE_STAGES - 5;
     reg [3:0]log_m_pipe[ROUTER_INPUT_PIPE_STAGES + 1:0];
     reg [3:0]log_t_pipe[ROUTER_INPUT_PIPE_STAGES + 1:0];
     reg [8:0]upper_read_address_pipe[ROUTER_INPUT_PIPE_STAGES + 1:0];
     reg [8:0]lower_read_address_pipe[ROUTER_INPUT_PIPE_STAGES + 1:0];
 
     // pipeline delay to wait for last multiplication before outputting addresses
-    localparam ADDRESS_OUT_PIPE_STAGES = 3;
+    localparam ADDRESS_OUT_PIPE_STAGES = PIPE_STAGES - 8;
     wire [8:0]router_address_out;
     reg [8:0]address_out_pipe[ADDRESS_OUT_PIPE_STAGES:0];
     assign address_out = address_out_pipe[ADDRESS_OUT_PIPE_STAGES];

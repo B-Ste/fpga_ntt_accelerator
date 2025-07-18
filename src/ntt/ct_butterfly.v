@@ -8,7 +8,7 @@ module ct_butterfly (
 
     parameter MOD_INDEX = 0;
     
-    localparam PIPE_STAGES = 3;
+    localparam PIPE_STAGES = 4;
 
     wire [29:0]mult_out;
     reg [29:0]pipe[PIPE_STAGES:0];

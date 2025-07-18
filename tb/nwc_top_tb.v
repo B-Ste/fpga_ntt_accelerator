@@ -4,23 +4,26 @@ module nwc_top_tb ();
 
     reg clk = 0;
     reg start;
-    reg [63:0]data_in0, data_in1;
-    wire [10:0]addr0, addr1, addrw;
-    wire [63:0]data_out;
-    wire [7:0]out_wen;
-    wire done;
+    reg [31:0]data_in0_up, data_in0_down, data_in1_up, data_in1_down;
+    wire [12:0]addrr, addrw;
+    wire [31:0]data_out_up, data_out_down;
+    wire [3:0]out_wen;
+    wire done, ready;
 
     nwc_top dut (
         .clk(clk), 
         .start(start),
-        .addr0(addr0),
-        .data_in0(data_in0),
-        .addr1(addr1),
-        .data_in1(data_in1),
+        .addrr(addrr),
+        .data_in0_up(data_in0_up),
+        .data_in0_down(data_in0_down),
+        .data_in1_up(data_in1_up),
+        .data_in1_down(data_in1_down),
         .addrw(addrw),
-        .data_out(data_out),
+        .data_out_up(data_out_up),
+        .data_out_down(data_out_down),
         .out_wen(out_wen),
-        .done(done)
+        .done(done),
+        .ready(ready)
     );
 
     always #50 clk = ~clk;
@@ -31,11 +34,11 @@ module nwc_top_tb ();
         start = 0;
     end
 
-    reg [63:0]data_reg;
     always @(posedge clk) begin
-        data_reg <= addr0;
-        data_in0 <= data_reg;
-        data_in1 <= data_reg;
+        data_in0_up <= addrr >> 2;
+        data_in0_down <= (addrr >> 2) + 2048;
+        data_in1_up <= addrr >> 2;
+        data_in1_down <= (addrr >> 2) + 2048;
     end
     
 endmodule

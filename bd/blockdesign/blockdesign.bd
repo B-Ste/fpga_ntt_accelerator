@@ -33,11 +33,12 @@
       "blk_mem_gen_4": "",
       "axi_bram_ctrl_5": "",
       "blk_mem_gen_5": "",
-      "nwc_top_0": "",
       "xlslice_0": "",
       "xlconcat_1": "",
       "xlconcat_3": "",
-      "xlconstant_5": ""
+      "xlconstant_5": "",
+      "ila_0": "",
+      "nwc_top_0": ""
     },
     "components": {
       "zynq_ultra_ps_e_0": {
@@ -378,6 +379,9 @@
           "PSU__CRL_APB__PL0_REF_CTRL__SRCSEL": {
             "value": "IOPLL"
           },
+          "PSU__CRL_APB__PL1_REF_CTRL__ACT_FREQMHZ": {
+            "value": "199.980026"
+          },
           "PSU__CRL_APB__QSPI_REF_CTRL__ACT_FREQMHZ": {
             "value": "124.987511"
           },
@@ -623,6 +627,9 @@
           },
           "PSU__FPGA_PL0_ENABLE": {
             "value": "1"
+          },
+          "PSU__FPGA_PL1_ENABLE": {
+            "value": "0"
           },
           "PSU__GEM3_COHERENCY": {
             "value": "0"
@@ -1267,9 +1274,6 @@
           "Memory_Type": {
             "value": "True_Dual_Port_RAM"
           },
-          "PRIM_type_to_Implement": {
-            "value": "BRAM"
-          },
           "Read_Width_A": {
             "value": "32"
           },
@@ -1686,7 +1690,7 @@
             "value": "0"
           },
           "CONST_WIDTH": {
-            "value": "21"
+            "value": "19"
           }
         }
       },
@@ -1697,7 +1701,7 @@
         "inst_hier_path": "xlconcat_0",
         "parameters": {
           "IN0_WIDTH": {
-            "value": "11"
+            "value": "13"
           }
         }
       },
@@ -1708,7 +1712,7 @@
         "inst_hier_path": "xlconcat_2",
         "parameters": {
           "IN0_WIDTH": {
-            "value": "11"
+            "value": "13"
           }
         }
       },
@@ -1823,87 +1827,6 @@
           }
         }
       },
-      "nwc_top_0": {
-        "vlnv": "xilinx.com:module_ref:nwc_top:1.0",
-        "xci_name": "blockdesign_nwc_top_0_1",
-        "xci_path": "ip/blockdesign_nwc_top_0_1/blockdesign_nwc_top_0_1.xci",
-        "inst_hier_path": "nwc_top_0",
-        "reference_info": {
-          "ref_type": "hdl",
-          "ref_name": "nwc_top",
-          "boundary_crc": "0x0"
-        },
-        "ports": {
-          "clk": {
-            "type": "clk",
-            "direction": "I",
-            "parameters": {
-              "FREQ_HZ": {
-                "value": "99990005",
-                "value_src": "user_prop"
-              },
-              "CLK_DOMAIN": {
-                "value": "blockdesign_zynq_ultra_ps_e_0_1_pl_clk0",
-                "value_src": "default_prop"
-              }
-            }
-          },
-          "start": {
-            "direction": "I"
-          },
-          "addrr": {
-            "direction": "O",
-            "left": "10",
-            "right": "0"
-          },
-          "data_in0_up": {
-            "direction": "I",
-            "left": "31",
-            "right": "0"
-          },
-          "data_in0_down": {
-            "direction": "I",
-            "left": "31",
-            "right": "0"
-          },
-          "data_in1_up": {
-            "direction": "I",
-            "left": "31",
-            "right": "0"
-          },
-          "data_in1_down": {
-            "direction": "I",
-            "left": "31",
-            "right": "0"
-          },
-          "addrw": {
-            "direction": "O",
-            "left": "10",
-            "right": "0"
-          },
-          "data_out_up": {
-            "direction": "O",
-            "left": "31",
-            "right": "0"
-          },
-          "data_out_down": {
-            "direction": "O",
-            "left": "31",
-            "right": "0"
-          },
-          "out_wen": {
-            "direction": "O",
-            "left": "3",
-            "right": "0"
-          },
-          "done": {
-            "direction": "O"
-          },
-          "ready": {
-            "direction": "O"
-          }
-        }
-      },
       "xlslice_0": {
         "vlnv": "xilinx.com:ip:xlslice:1.0",
         "xci_name": "blockdesign_xlslice_0_0",
@@ -1935,6 +1858,137 @@
         "parameters": {
           "CONST_VAL": {
             "value": "0"
+          }
+        }
+      },
+      "ila_0": {
+        "vlnv": "xilinx.com:ip:ila:6.2",
+        "xci_name": "blockdesign_ila_0_1",
+        "xci_path": "ip/blockdesign_ila_0_1/blockdesign_ila_0_1.xci",
+        "inst_hier_path": "ila_0",
+        "parameters": {
+          "C_DATA_DEPTH": {
+            "value": "16384"
+          },
+          "C_EN_STRG_QUAL": {
+            "value": "0"
+          },
+          "C_MONITOR_TYPE": {
+            "value": "Native"
+          },
+          "C_NUM_OF_PROBES": {
+            "value": "13"
+          },
+          "C_PROBE0_WIDTH": {
+            "value": "32"
+          },
+          "C_PROBE12_WIDTH": {
+            "value": "32"
+          },
+          "C_PROBE1_WIDTH": {
+            "value": "32"
+          },
+          "C_PROBE2_WIDTH": {
+            "value": "32"
+          },
+          "C_PROBE3_WIDTH": {
+            "value": "32"
+          },
+          "C_PROBE4_WIDTH": {
+            "value": "32"
+          },
+          "C_PROBE5_WIDTH": {
+            "value": "32"
+          },
+          "C_PROBE6_WIDTH": {
+            "value": "13"
+          },
+          "C_PROBE7_WIDTH": {
+            "value": "13"
+          },
+          "C_PROBE8_WIDTH": {
+            "value": "4"
+          }
+        }
+      },
+      "nwc_top_0": {
+        "vlnv": "xilinx.com:module_ref:nwc_top:1.0",
+        "xci_name": "blockdesign_nwc_top_0_1",
+        "xci_path": "ip/blockdesign_nwc_top_0_1/blockdesign_nwc_top_0_1.xci",
+        "inst_hier_path": "nwc_top_0",
+        "reference_info": {
+          "ref_type": "hdl",
+          "ref_name": "nwc_top",
+          "boundary_crc": "0x0"
+        },
+        "ports": {
+          "clk": {
+            "type": "clk",
+            "direction": "I",
+            "parameters": {
+              "FREQ_HZ": {
+                "value": "99990005",
+                "value_src": "user_prop"
+              },
+              "CLK_DOMAIN": {
+                "value": "blockdesign_zynq_ultra_ps_e_0_1_pl_clk0",
+                "value_src": "default_prop"
+              }
+            }
+          },
+          "start": {
+            "direction": "I"
+          },
+          "addrr": {
+            "direction": "O",
+            "left": "12",
+            "right": "0"
+          },
+          "data_in0_up": {
+            "direction": "I",
+            "left": "31",
+            "right": "0"
+          },
+          "data_in0_down": {
+            "direction": "I",
+            "left": "31",
+            "right": "0"
+          },
+          "data_in1_up": {
+            "direction": "I",
+            "left": "31",
+            "right": "0"
+          },
+          "data_in1_down": {
+            "direction": "I",
+            "left": "31",
+            "right": "0"
+          },
+          "addrw": {
+            "direction": "O",
+            "left": "12",
+            "right": "0"
+          },
+          "data_out_up": {
+            "direction": "O",
+            "left": "31",
+            "right": "0"
+          },
+          "data_out_down": {
+            "direction": "O",
+            "left": "31",
+            "right": "0"
+          },
+          "out_wen": {
+            "direction": "O",
+            "left": "3",
+            "right": "0"
+          },
+          "done": {
+            "direction": "O"
+          },
+          "ready": {
+            "direction": "O"
           }
         }
       }
@@ -2041,68 +2095,79 @@
       "blk_mem_gen_0_doutb": {
         "ports": [
           "blk_mem_gen_0/doutb",
+          "ila_0/probe0",
           "nwc_top_0/data_in0_up"
         ]
       },
       "blk_mem_gen_1_doutb": {
         "ports": [
           "blk_mem_gen_1/doutb",
+          "ila_0/probe1",
           "nwc_top_0/data_in0_down"
         ]
       },
       "blk_mem_gen_2_doutb": {
         "ports": [
           "blk_mem_gen_2/doutb",
+          "ila_0/probe2",
           "nwc_top_0/data_in1_up"
         ]
       },
       "blk_mem_gen_3_doutb": {
         "ports": [
           "blk_mem_gen_3/doutb",
+          "ila_0/probe3",
           "nwc_top_0/data_in1_down"
         ]
       },
       "nwc_top_0_addr0": {
         "ports": [
           "nwc_top_0/addrr",
-          "xlconcat_0/In0"
+          "xlconcat_0/In0",
+          "ila_0/probe6"
         ]
       },
       "nwc_top_0_addrw": {
         "ports": [
           "nwc_top_0/addrw",
-          "xlconcat_2/In0"
+          "xlconcat_2/In0",
+          "ila_0/probe7"
         ]
       },
       "nwc_top_0_data_out_down": {
         "ports": [
           "nwc_top_0/data_out_down",
-          "blk_mem_gen_5/dinb"
+          "blk_mem_gen_5/dinb",
+          "ila_0/probe5"
         ]
       },
       "nwc_top_0_data_out_up": {
         "ports": [
           "nwc_top_0/data_out_up",
-          "blk_mem_gen_4/dinb"
+          "blk_mem_gen_4/dinb",
+          "ila_0/probe4"
         ]
       },
       "nwc_top_0_done": {
         "ports": [
           "nwc_top_0/done",
-          "xlconcat_1/In0"
+          "xlconcat_1/In0",
+          "ila_0/probe10"
         ]
       },
       "nwc_top_0_out_wen": {
         "ports": [
           "nwc_top_0/out_wen",
           "blk_mem_gen_4/web",
-          "blk_mem_gen_5/web"
+          "blk_mem_gen_5/web",
+          "ila_0/probe8"
         ]
       },
       "nwc_top_0_ready": {
         "ports": [
           "nwc_top_0/ready",
-          "xlconcat_1/In1"
+          "xlconcat_1/In1",
+          "ila_0/probe11"
         ]
       },
       "rst_ps8_0_99M_peripheral_aresetn": {
@@ -2124,7 +2189,8 @@
           "blk_mem_gen_0/addrb",
           "blk_mem_gen_1/addrb",
           "blk_mem_gen_3/addrb",
-          "blk_mem_gen_2/addrb"
+          "blk_mem_gen_2/addrb",
+          "ila_0/probe12"
         ]
       },
       "xlconcat_1_dout": {
@@ -2201,6 +2267,7 @@
       "xlslice_0_Dout": {
         "ports": [
           "xlslice_0/Dout",
+          "ila_0/probe9",
           "nwc_top_0/start"
         ]
       },
@@ -2224,6 +2291,7 @@
           "axi_bram_ctrl_5/s_axi_aclk",
           "blk_mem_gen_4/clkb",
           "blk_mem_gen_5/clkb",
+          "ila_0/clk",
           "nwc_top_0/clk"
         ]
       },

@@ -96,7 +96,7 @@ module nwc_processor #(
     wire intt_output_active;
 
     // delay start signal to intt processor to account for multiplication
-    localparam START_STAGES = 2;
+    localparam START_STAGES = 3;
     reg start_pipe[START_STAGES:0];
     assign intt_start = start_pipe[START_STAGES];
     integer f;
@@ -141,13 +141,17 @@ module nwc_processor #(
     endgenerate
 
     // control result output and assign fitting memory contents to data output
+    localparam PIPE_STAGES = 3;
     reg [10:0]output_address = 0;
-    reg intt_output_active_pipe[1:0] = '{0, 0};
-    assign output_active = intt_output_active_pipe[1];
+    reg intt_output_active_pipe[PIPE_STAGES:0];
+    assign output_active = intt_output_active_pipe[PIPE_STAGES];
+    integer c;
     always @(posedge clk) begin
-        intt_output_active_pipe[0] <= intt_output_active || (intt_output_active_pipe[0] && (output_address != 2047));
-        intt_output_active_pipe[1] <= intt_output_active_pipe[0];
-        if (intt_output_active_pipe[0]) begin
+        intt_output_active_pipe[0] <= intt_output_active || (intt_output_active_pipe[0] && (output_address != (2048 - PIPE_STAGES)));
+        for (c = 0; c < PIPE_STAGES; c = c + 1) begin
+            intt_output_active_pipe[c + 1] <= intt_output_active_pipe[c];
+        end
+        if (intt_output_active_pipe[PIPE_STAGES - 1] == 1) begin
             for (f = 0; f < (1 << LOG_CORE_COUNT); f = f + 1) begin
                 if (f == output_address[9:(9 - LOG_CORE_COUNT + 1)]) begin
                     if (output_address[10] == 0) begin

@@ -12,7 +12,7 @@ module ntt_processor #(
         output ready
     );
     
-    localparam PIPE_STAGES = 10;
+    localparam PIPE_STAGES = 11;
     localparam LOG_N = 12;
     localparam N_4 = 1024;
     localparam ALG_FIRST_STAGE = 2'd0;

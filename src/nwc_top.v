@@ -5,12 +5,12 @@ module nwc_top #(
     parameter LOG_CORE_COUNT = 3)(
     input clk, 
     input start,
-    output [10:0]addrr,
+    output [12:0]addrr,
     input [31:0]data_in0_up,
     input [31:0]data_in0_down,
     input [31:0]data_in1_up,
     input [31:0]data_in1_down,
-    output [10:0]addrw,
+    output [12:0]addrw,
     output [31:0]data_out_up,
     output [31:0]data_out_down,
     output [3:0]out_wen,
@@ -47,8 +47,8 @@ module nwc_top #(
         .clk(clk),
         .data_in0(data_in0[59:0]),
         .data_in1(data_in1[59:0]),
-        .write_enable(processor_wen[2]),
-        .start(processor_start[2]),
+        .write_enable(processor_wen[1]),
+        .start(processor_start[1]),
         .data_out(processor_data_out),
         .output_active(output_active),
         .ready(processor_ready)
@@ -65,8 +65,8 @@ module nwc_top #(
         addrw_reg <= 0;
     end
 
-    assign addrr = addrr_reg;
-    assign addrw = addrw_reg;
+    assign addrr = addrr_reg << 2;
+    assign addrw = addrw_reg << 2;
     assign out_wen = output_active ? 4'b1111 : 0; 
 
     reg input_state = 0;
