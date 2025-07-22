@@ -14,8 +14,9 @@ module nwc_top #(
     output [31:0]data_out_up,
     output [31:0]data_out_down,
     output [3:0]out_wen,
-    output reg done = 0,
-    output ready
+    output reg output_ready = 0,
+    output start_ready,
+    output memory_writable
     );
 
     reg processor_start[2:0];
@@ -78,7 +79,8 @@ module nwc_top #(
         input_triggered[1] <= 0;
     end
 
-    assign ready = (input_triggered[0] || input_triggered[1]) ? 0 : (processor_ready && (input_state == 0));
+    assign start_ready = (input_triggered[0] || input_triggered[1]) ? 0 : (processor_ready && (input_state == 0));
+    assign memory_writable = (input_state == 0) && (start == 0);
 
     always @(posedge clk) begin
         input_triggered[1] <= input_triggered[0];
@@ -111,12 +113,12 @@ module nwc_top #(
     always @(posedge clk) begin
         if (output_active) begin
             addrw_reg <= addrw_reg + 1;
-            done <= 0;
+            output_ready <= 0;
         end else begin
             addrw_reg <= 0;
         end
         if (addrw_reg == 2047) begin
-            done <= 1;
+            output_ready <= 1;
         end
     end
 

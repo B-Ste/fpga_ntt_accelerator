@@ -34,11 +34,11 @@
       "axi_bram_ctrl_5": "",
       "blk_mem_gen_5": "",
       "xlslice_0": "",
-      "xlconcat_1": "",
       "xlconcat_3": "",
       "xlconstant_5": "",
       "ila_0": "",
-      "nwc_top_0": ""
+      "nwc_top_0": "",
+      "xlconcat_1": ""
     },
     "components": {
       "zynq_ultra_ps_e_0": {
@@ -1676,7 +1676,7 @@
             "value": "0"
           },
           "C_GPIO_WIDTH": {
-            "value": "3"
+            "value": "4"
           }
         }
       },
@@ -1834,15 +1834,9 @@
         "inst_hier_path": "xlslice_0",
         "parameters": {
           "DIN_WIDTH": {
-            "value": "3"
+            "value": "4"
           }
         }
-      },
-      "xlconcat_1": {
-        "vlnv": "xilinx.com:ip:xlconcat:2.1",
-        "xci_name": "blockdesign_xlconcat_1_2",
-        "xci_path": "ip/blockdesign_xlconcat_1_2/blockdesign_xlconcat_1_2.xci",
-        "inst_hier_path": "xlconcat_1"
       },
       "xlconcat_3": {
         "vlnv": "xilinx.com:ip:xlconcat:2.1",
@@ -1877,7 +1871,7 @@
             "value": "Native"
           },
           "C_NUM_OF_PROBES": {
-            "value": "13"
+            "value": "14"
           },
           "C_PROBE0_WIDTH": {
             "value": "32"
@@ -1984,11 +1978,25 @@
             "left": "3",
             "right": "0"
           },
-          "done": {
+          "output_ready": {
             "direction": "O"
           },
-          "ready": {
+          "start_ready": {
             "direction": "O"
+          },
+          "memory_writable": {
+            "direction": "O"
+          }
+        }
+      },
+      "xlconcat_1": {
+        "vlnv": "xilinx.com:ip:xlconcat:2.1",
+        "xci_name": "blockdesign_xlconcat_1_3",
+        "xci_path": "ip/blockdesign_xlconcat_1_3/blockdesign_xlconcat_1_3.xci",
+        "inst_hier_path": "xlconcat_1",
+        "parameters": {
+          "NUM_PORTS": {
+            "value": "3"
           }
         }
       }
@@ -2148,11 +2156,11 @@
           "ila_0/probe4"
         ]
       },
-      "nwc_top_0_done": {
+      "nwc_top_0_memory_writable": {
         "ports": [
-          "nwc_top_0/done",
-          "xlconcat_1/In0",
-          "ila_0/probe10"
+          "nwc_top_0/memory_writable",
+          "xlconcat_1/In2",
+          "ila_0/probe13"
         ]
       },
       "nwc_top_0_out_wen": {
@@ -2163,9 +2171,16 @@
           "ila_0/probe8"
         ]
       },
-      "nwc_top_0_ready": {
+      "nwc_top_0_output_ready": {
         "ports": [
-          "nwc_top_0/ready",
+          "nwc_top_0/output_ready",
+          "xlconcat_1/In0",
+          "ila_0/probe10"
+        ]
+      },
+      "nwc_top_0_start_ready": {
+        "ports": [
+          "nwc_top_0/start_ready",
           "xlconcat_1/In1",
           "ila_0/probe11"
         ]
