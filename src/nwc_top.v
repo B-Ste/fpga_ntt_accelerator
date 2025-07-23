@@ -114,6 +114,8 @@ module nwc_top #(
         if (output_active) begin
             addrw_reg <= addrw_reg + 1;
             output_ready <= 0;
+        end else if (start) begin
+            output_ready <= 0;
         end else begin
             addrw_reg <= 0;
         end
