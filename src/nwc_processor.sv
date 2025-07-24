@@ -10,7 +10,8 @@ module nwc_processor #(
     input start,
     output reg [59:0]data_out,
     output output_active,
-    output ready
+    output ready,
+    output computation_finished
     );
 
     // generate write addresses for ntt processors to save on input ports
@@ -94,6 +95,27 @@ module nwc_processor #(
     wire [59:0]intt_out[(1 << LOG_CORE_COUNT) - 1:0][1:0];
     wire [(9 - LOG_CORE_COUNT):0]intt_address_out;
     wire intt_output_active;
+    reg computation_finished_state = 0;
+    reg computation_finished_reg = 0;
+
+    assign computation_finished = computation_finished_reg;
+
+    always @(posedge clk) begin
+        case (computation_finished_state)
+            0 : begin
+                computation_finished_reg <= 0;
+                if (intt_output_active == 1) begin
+                    computation_finished_state <= 1;
+                end
+            end
+            1 : begin
+                if (intt_output_active == 0) begin
+                    computation_finished_reg <= 1;
+                    computation_finished_state <= 0;
+                end
+            end 
+        endcase
+    end
 
     // delay start signal to intt processor to account for multiplication
     localparam START_STAGES = 3;

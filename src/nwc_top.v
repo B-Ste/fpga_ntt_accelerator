@@ -16,11 +16,20 @@ module nwc_top #(
     output [3:0]out_wen,
     output reg output_ready = 0,
     output start_ready,
-    output memory_writable
+    output memory_writable,
+    output reg computation_started = 0,
+    output reg computation_finished = 0
     );
 
     reg processor_start[2:0];
     reg processor_wen[2:0];
+
+    always @(posedge clk) begin
+        if (processor_start[1] == 1)
+            computation_started <= 1;
+        else if (start_ready == 1)
+            computation_started <= 0;
+    end
 
     initial begin
         processor_start[0] = 0;
@@ -39,7 +48,14 @@ module nwc_top #(
     end
 
     wire [59:0]processor_data_out, data_in0, data_in1;
-    wire processor_ready;
+    wire processor_ready, processor_computation_finished;
+
+    always @(posedge clk) begin
+        if (processor_computation_finished == 1)
+            computation_finished <= 1;
+        else if (start == 1)
+            computation_finished <= 0;
+    end
     
     assign data_in0 = {data_in0_down[29:0], data_in0_up[29:0]};
     assign data_in1 = {data_in1_down[29:0], data_in1_up[29:0]};
@@ -52,7 +68,8 @@ module nwc_top #(
         .start(processor_start[1]),
         .data_out(processor_data_out),
         .output_active(output_active),
-        .ready(processor_ready)
+        .ready(processor_ready),
+        .computation_finished(processor_computation_finished)
         );
 
     assign data_out_up = {2'd0, processor_data_out[29:0]};

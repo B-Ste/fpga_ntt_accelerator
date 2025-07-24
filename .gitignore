@@ -25,3 +25,9 @@ tb/nwc_processor_test/ntt_bench_bar
 !bd
 !bd/blockdesign
 !bd/blockdesign/blockdesign.bd
+!fw
+!fw/testbench_0
+fw/testbench_0/.gitignore
+!fw/testbench_0/src
+!fw/testbench_0/src/*.c
+!fw/testbench_0/src/*.h

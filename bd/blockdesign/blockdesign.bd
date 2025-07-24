@@ -1675,7 +1675,7 @@
             "value": "0"
           },
           "C_GPIO_WIDTH": {
-            "value": "4"
+            "value": "6"
           }
         }
       },
@@ -1833,7 +1833,7 @@
         "inst_hier_path": "xlslice_0",
         "parameters": {
           "DIN_WIDTH": {
-            "value": "4"
+            "value": "6"
           }
         }
       },
@@ -1861,7 +1861,7 @@
         "inst_hier_path": "xlconcat_1",
         "parameters": {
           "NUM_PORTS": {
-            "value": "3"
+            "value": "5"
           }
         }
       },
@@ -1945,6 +1945,12 @@
             "direction": "O"
           },
           "memory_writable": {
+            "direction": "O"
+          },
+          "computation_started": {
+            "direction": "O"
+          },
+          "computation_finished": {
             "direction": "O"
           }
         }
@@ -2083,6 +2089,18 @@
         "ports": [
           "nwc_top_0/addrw",
           "xlconcat_2/In0"
+        ]
+      },
+      "nwc_top_0_computation_finished": {
+        "ports": [
+          "nwc_top_0/computation_finished",
+          "xlconcat_1/In4"
+        ]
+      },
+      "nwc_top_0_computation_stared": {
+        "ports": [
+          "nwc_top_0/computation_started",
+          "xlconcat_1/In3"
         ]
       },
       "nwc_top_0_data_out_down": {

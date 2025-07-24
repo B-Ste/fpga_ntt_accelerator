@@ -8,7 +8,7 @@ module nwc_top_tb ();
     wire [12:0]addrr, addrw;
     wire [31:0]data_out_up, data_out_down;
     wire [3:0]out_wen;
-    wire done, ready, memory_writable;
+    wire done, ready, memory_writable, computation_started, computation_finished;
 
     nwc_top dut (
         .clk(clk), 
@@ -24,7 +24,9 @@ module nwc_top_tb ();
         .out_wen(out_wen),
         .output_ready(done),
         .start_ready(ready),
-        .memory_writable(memory_writable)
+        .memory_writable(memory_writable),
+        .computation_started(computation_started),
+        .computation_finished(computation_finished)
     );
 
     always #50 clk = ~clk;
