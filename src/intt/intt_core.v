@@ -29,6 +29,7 @@ module intt_core #(
     reg [29:0] upper_twiddle_reg, lower_twiddle_reg;
     reg input_select_reg;
     reg [59:0]upper_direct_input_reg, lower_direct_input_reg;
+    reg [11:0] upper_twiddle_index_reg, lower_twiddle_index_reg;
 
     generate
         if (CORE_INDEX % 2 == 0) begin
@@ -49,6 +50,8 @@ module intt_core #(
     endgenerate
 
     always @(posedge clk) begin
+        upper_twiddle_index_reg <= upper_twiddle_index;
+        lower_twiddle_index_reg <= lower_twiddle_index;
         upper_twiddle_reg <= upper_twiddle;
         lower_twiddle_reg <= lower_twiddle;
         input_select_reg <= input_select;
@@ -59,11 +62,11 @@ module intt_core #(
     generate
         if (MOD_INDEX == 4'd0) begin
             inv_twiddle_table_0 twiddle_rom_0 (
-                .a(upper_twiddle_index),        // input wire [11 : 0] a
+                .a(upper_twiddle_index_reg),        // input wire [11 : 0] a
                 .spo(upper_twiddle)             // output wire [29 : 0] spo
             );
             inv_twiddle_table_0 twiddle_rom_1 (
-                .a(lower_twiddle_index),        // input wire [11 : 0] a
+                .a(lower_twiddle_index_reg),        // input wire [11 : 0] a
                 .spo(lower_twiddle)             // output wire [29 : 0] spo
             );
         end else if (MOD_INDEX == 4'd1) begin
@@ -206,7 +209,7 @@ module intt_core #(
         .clk(clk),
         .A(upper_bf_input[29:0]),
         .B(upper_bf_input[59:30]),
-        .w(upper_twiddle_reg),
+        .w(upper_twiddle),
         .a(r1),
         .b(r2)
     );
@@ -215,7 +218,7 @@ module intt_core #(
         .clk(clk),
         .A(lower_bf_input[29:0]),
         .B(lower_bf_input[59:30]),
-        .w(lower_twiddle_reg),
+        .w(lower_twiddle),
         .a(r3),
         .b(r4)
     );

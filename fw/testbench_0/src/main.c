@@ -8,6 +8,11 @@
 #include "ntt.h"
 #include "performance.h"
 
+#define ITERATIONS 100
+#define STAGGERED_ITERATIONS 500
+#define SHARED_MEM_BASE 0xFFFC0000
+#define CPS 1200000000
+
 void set_start();
 void reset_start();
 int get_start_ready();
@@ -55,10 +60,9 @@ int main() {
 	xil_printf("Initialization done\r\n");
 	xil_printf("Running correctness and sequential timing test\r\n");
 
-	int iterations = 100;
 	int failed = 0;
 
-	for (int k = 0; k < iterations; k++) {
+	for (int k = 0; k < ITERATIONS; k++) {
 		for (unsigned int i = 0; i < 4096; i++) {
 			unsigned int a = mod_barrett(rand(), q);
 			unsigned int b = mod_barrett(rand(), q);
@@ -96,7 +100,7 @@ int main() {
 
 	xil_printf("Start computation only sequential timing test\r\n");
 
-	for (int k = 0; k < iterations; k++) {
+	for (int k = 0; k < ITERATIONS; k++) {
 		for (unsigned int i = 0; i < 4096; i++) {
 			unsigned int a = mod_barrett(rand(), q);
 			unsigned int b = mod_barrett(rand(), q);
@@ -123,6 +127,30 @@ int main() {
 	STOP_TIMING
 
 	xil_printf("Finished computation only sequential timing test\r\n");
+	xil_printf("Start staggered performance test\r\n");
+
+	uint64_t start;
+	for (int i = 0; i < STAGGERED_ITERATIONS; i++) {
+		if (i == 3) start = arm_v8_get_timing();
+
+		while(!get_start_ready());
+
+		set_start();
+		reset_start();
+	}
+
+	volatile uint64_t* read_a = (uint64_t*) SHARED_MEM_BASE;
+	int execution_count = 0;
+	for (int i = 0; i < 2 * ITERATIONS + STAGGERED_ITERATIONS; i++) {
+		uint64_t time = read_a[i];
+		if (time >= start) {
+			if (time - start < CPS) execution_count++;
+			else break;
+		}
+	}
+
+	xil_printf("Executed computations per second: %i\r\n", execution_count);
+	xil_printf("Finished staggered performance test\r\n");
 
 	return 0;
 }

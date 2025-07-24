@@ -23,6 +23,7 @@ module ntt_core (
 
     wire [11:0] upper_twiddle_index, lower_twiddle_index;
     wire [29:0] upper_twiddle, lower_twiddle;
+    reg [11:0] upper_twiddle_index_reg, lower_twiddle_index_reg;
     reg [29:0] upper_twiddle_reg;
     reg [29:0] lower_twiddle_reg;
 
@@ -45,6 +46,8 @@ module ntt_core (
     endgenerate
 
     always @(posedge clk) begin
+        upper_twiddle_index_reg <= upper_twiddle_index;
+        lower_twiddle_index_reg <= lower_twiddle_index;
         upper_twiddle_reg <= upper_twiddle;
         lower_twiddle_reg <= lower_twiddle;
     end
@@ -52,11 +55,11 @@ module ntt_core (
     generate
         if (MOD_INDEX == 4'd0) begin
             twiddle_table_q0 twiddle_rom_0 (
-                .a(upper_twiddle_index),        // input wire [11 : 0] a
+                .a(upper_twiddle_index_reg),        // input wire [11 : 0] a
                 .spo(upper_twiddle)             // output wire [29 : 0] spo
             );
             twiddle_table_q0 twiddle_rom_1 (
-                .a(lower_twiddle_index),        // input wire [11 : 0] a
+                .a(lower_twiddle_index_reg),        // input wire [11 : 0] a
                 .spo(lower_twiddle)             // output wire [29 : 0] spo
             );
         end else if (MOD_INDEX == 4'd1) begin
@@ -196,7 +199,7 @@ module ntt_core (
         .clk(clk),
         .a(upper_bram_output[29:0]),
         .b(upper_bram_output[59:30]),
-        .w(upper_twiddle_reg),
+        .w(upper_twiddle),
         .A(r1),
         .B(r2)
     );
@@ -205,7 +208,7 @@ module ntt_core (
         .clk(clk),
         .a(lower_bram_output[29:0]),
         .b(lower_bram_output[59:30]),
-        .w(lower_twiddle_reg),
+        .w(lower_twiddle),
         .A(r3),
         .B(r4)
     );
