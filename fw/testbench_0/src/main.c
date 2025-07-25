@@ -9,9 +9,8 @@
 #include "performance.h"
 
 #define ITERATIONS 100
-#define STAGGERED_ITERATIONS 500
+#define STAGGERED_ITERATIONS 80000
 #define SHARED_MEM_BASE 0xFFFC0000
-#define CPS 1200000000
 
 void set_start();
 void reset_start();
@@ -129,9 +128,9 @@ int main() {
 	xil_printf("Finished computation only sequential timing test\r\n");
 	xil_printf("Start staggered performance test\r\n");
 
-	uint64_t start;
+	volatile uint64_t* read_a = (uint64_t*) SHARED_MEM_BASE + 1;
 	for (int i = 0; i < STAGGERED_ITERATIONS; i++) {
-		if (i == 3) start = arm_v8_get_timing();
+		if (i == 3) *(read_a++) = 1;
 
 		while(!get_start_ready());
 
@@ -139,15 +138,7 @@ int main() {
 		reset_start();
 	}
 
-	volatile uint64_t* read_a = (uint64_t*) SHARED_MEM_BASE;
-	int execution_count = 0;
-	for (int i = 0; i < 2 * ITERATIONS + STAGGERED_ITERATIONS; i++) {
-		uint64_t time = read_a[i];
-		if (time >= start) {
-			if (time - start < CPS) execution_count++;
-			else break;
-		}
-	}
+	uint64_t execution_count = *read_a;
 
 	xil_printf("Executed computations per second: %i\r\n", execution_count);
 	xil_printf("Finished staggered performance test\r\n");

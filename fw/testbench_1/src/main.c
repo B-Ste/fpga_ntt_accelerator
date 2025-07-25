@@ -4,6 +4,7 @@
 #include "xil_io.h"
 
 #define SHARED_MEM_BASE 0xFFFC0000
+#define CPS 1200000000
 
 #define ARMV8_PMCR_E            (1 << 0) /* Enable all counters */
 #define ARMV8_PMCR_P            (1 << 1) /* Reset all counters */
@@ -12,7 +13,7 @@
 
 #define ARMV8_PMCNTENSET_EL0_EN (1 << 31) /* Performance Monitors Count Enable Set register */
 
-volatile uint64_t* write_p = (uint64_t*) SHARED_MEM_BASE;
+volatile uint64_t* write_p = (uint64_t*) SHARED_MEM_BASE + 1;
 XGpio gpio;
 
 static inline void arm_v8_timing_init(void)
@@ -52,11 +53,21 @@ int main() {
 
     arm_v8_timing_init();
 
+    while(!*write_p);
+    write_p++;
+    uint64_t start = arm_v8_get_timing();
+
     int state = 0;
-    while(write_p != (uint64_t) 0xFFFFFFFF) {
+    uint64_t executions = 0;
+    while(write_p != (uint64_t*) 0xFFFFFFFF) {
         int i = get_output_ready();
+        uint64_t time = arm_v8_get_timing();
+        if (time - start >= CPS) break;
         if (i != state) {
-            if (i == 1) *(write_p++) = arm_v8_get_timing();
+            if (i == 1) {
+            	executions++;
+            	*write_p = executions;
+            }
             state = i;
         }
     }
