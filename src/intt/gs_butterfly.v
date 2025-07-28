@@ -30,7 +30,7 @@ module gs_butterfly (
     modular_multiplier #MOD_INDEX mult (
         .clk(clk),
         .a(sub_out),
-        .b(w_pipe[1]),
+        .b(w_pipe[0]),
         .c(b));
 
     assign a = add_pipe[PIPE_STAGES];

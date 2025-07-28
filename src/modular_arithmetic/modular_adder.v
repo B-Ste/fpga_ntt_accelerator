@@ -43,11 +43,11 @@ module modular_adder(
             assign q =1073479681;
     endgenerate
 
-    reg [30:0] sum;
+    wire [30:0] sum = a + b;
     
     always @(posedge clk)
     begin
-        sum <= a + b;
+        //sum <= a + b;
         if (sum >= q)
             c <= sum - q;
         else 

@@ -370,10 +370,10 @@
             "value": "IOPLL"
           },
           "PSU__CRL_APB__PL0_REF_CTRL__ACT_FREQMHZ": {
-            "value": "187.481262"
+            "value": "249.975021"
           },
           "PSU__CRL_APB__PL0_REF_CTRL__FREQMHZ": {
-            "value": "200"
+            "value": "250"
           },
           "PSU__CRL_APB__PL0_REF_CTRL__SRCSEL": {
             "value": "IOPLL"
@@ -1881,7 +1881,7 @@
             "direction": "I",
             "parameters": {
               "FREQ_HZ": {
-                "value": "187481262",
+                "value": "249975021",
                 "value_src": "user_prop"
               },
               "CLK_DOMAIN": {

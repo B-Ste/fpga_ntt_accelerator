@@ -17,7 +17,7 @@ module intt_processor #(
     reg write_enable, write_select, read_select, input_select;
     reg [1:0]mode = STANDBY;
 
-    localparam PIPE_STAGES = 12;
+    localparam PIPE_STAGES = 11;
 
     // pipeline delay to wait for valid output
     localparam OA_STAGES = PIPE_STAGES;
@@ -272,7 +272,7 @@ module intt_processor #(
     reg [8:0]lower_read_address_pipe[ROUTER_INPUT_PIPE_STAGES + 1:0];
 
     // pipeline delay to wait for last multiplication before outputting addresses
-    localparam ADDRESS_OUT_PIPE_STAGES = PIPE_STAGES - 8;
+    localparam ADDRESS_OUT_PIPE_STAGES = 4;
     wire [8:0]router_address_out;
     reg [8:0]address_out_pipe[ADDRESS_OUT_PIPE_STAGES:0];
     assign address_out = address_out_pipe[ADDRESS_OUT_PIPE_STAGES];

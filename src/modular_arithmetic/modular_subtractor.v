@@ -45,11 +45,11 @@ module modular_subtractor(
     wire signed [30:0]as = {1'b0, a};
     wire signed [30:0]bs = {1'b0, b};
     
-    reg signed[30:0] sub;
+    wire signed[30:0] sub = as - bs;
     
     always @(posedge clk)
     begin
-        sub <= as - bs;
+        //sub <= as - bs;
         if (sub < 0)
             c <= sub + q;
         else 
