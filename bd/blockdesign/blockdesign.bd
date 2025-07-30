@@ -5,7 +5,7 @@
       "device": "xczu9eg-ffvb1156-2-e",
       "name": "blockdesign",
       "rev_ctrl_bd_flag": "RevCtrlBdOff",
-      "synth_flow_mode": "Hierarchical",
+      "synth_flow_mode": "None",
       "tool_version": "2022.2",
       "validated": "true"
     },
@@ -175,7 +175,7 @@
             "value": "PSS_REF_CLK"
           },
           "PSU__CRF_APB__DP_AUDIO_REF_CTRL__ACT_FREQMHZ": {
-            "value": "24.997501"
+            "value": "24.997503"
           },
           "PSU__CRF_APB__DP_AUDIO_REF_CTRL__SRCSEL": {
             "value": "RPLL"
@@ -184,7 +184,7 @@
             "value": "0"
           },
           "PSU__CRF_APB__DP_STC_REF_CTRL__ACT_FREQMHZ": {
-            "value": "26.783037"
+            "value": "26.467943"
           },
           "PSU__CRF_APB__DP_STC_REF_CTRL__SRCSEL": {
             "value": "RPLL"
@@ -370,13 +370,13 @@
             "value": "IOPLL"
           },
           "PSU__CRL_APB__PL0_REF_CTRL__ACT_FREQMHZ": {
-            "value": "249.975021"
+            "value": "269.973022"
           },
           "PSU__CRL_APB__PL0_REF_CTRL__FREQMHZ": {
-            "value": "250"
+            "value": "270"
           },
           "PSU__CRL_APB__PL0_REF_CTRL__SRCSEL": {
-            "value": "IOPLL"
+            "value": "RPLL"
           },
           "PSU__CRL_APB__PL1_REF_CTRL__ACT_FREQMHZ": {
             "value": "199.980026"
@@ -1870,6 +1870,11 @@
         "xci_name": "blockdesign_nwc_top_0_1",
         "xci_path": "ip/blockdesign_nwc_top_0_1/blockdesign_nwc_top_0_1.xci",
         "inst_hier_path": "nwc_top_0",
+        "parameters": {
+          "LOG_CORE_COUNT": {
+            "value": "3"
+          }
+        },
         "reference_info": {
           "ref_type": "hdl",
           "ref_name": "nwc_top",
@@ -1881,7 +1886,7 @@
             "direction": "I",
             "parameters": {
               "FREQ_HZ": {
-                "value": "249975021",
+                "value": "269973022",
                 "value_src": "user_prop"
               },
               "CLK_DOMAIN": {
